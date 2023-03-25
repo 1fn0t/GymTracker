@@ -22,9 +22,22 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = Green500,
+    secondary = Pink600,
+    tertiary = Green300,
+
+//    surface = Green300,
+//    onSurface = Pink100,
+//    primaryContainer = Green300,
+//    surfaceTint = Pink100,
+    secondaryContainer = Pink100,
+    onSecondaryContainer = Pink600,
+//    tertiaryContainer = Pink100,
+    surfaceVariant = Grey200,
+//    onSurfaceVariant = Pink100,
+//    onSecondary = Pink100,
+//    onTertiary = Pink100,
+//    background = Pink100
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -41,21 +54,21 @@ private val LightColorScheme = lightColorScheme(
 fun GymTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+//    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+//            val context = LocalContext.current
+//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+//        }
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            (view.context as Activity).window.statusBarColor = colorScheme.primary.toArgb()
+            (view.context as Activity).window.statusBarColor = colorScheme.secondary.toArgb()
             ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
         }
     }

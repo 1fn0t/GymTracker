@@ -23,9 +23,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val navModel: NavViewModel = viewModel()
             GymTheme {
                 // A surface container using the 'background' color from the theme
+                val navModel: NavViewModel = viewModel()
                 Scaffold(
                     bottomBar = {
                         GymTrackNavigation(selectNavItem = { item ->
@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
                                 modifier = mod)
                         }
                         NavViewModel.SCREENCONTANTS.ADD_ROUTINES -> {
-                            AddRoutinesScreen(modifier = mod)
+                            AddRoutinesScreen(this, modifier = mod)
                         }
                     }
                 }
