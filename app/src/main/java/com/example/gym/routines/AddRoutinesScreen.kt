@@ -32,6 +32,7 @@ fun AddRoutinesScreen(
     context: Context,
     exerciseModel: ExerciseViewModel = viewModel(),
     muscleModel: MuscleViewModel = viewModel(),
+    repoModel: DatabaseViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
 //    val scrollState = rememberScrollState()
@@ -77,16 +78,14 @@ fun AddRoutinesScreen(
         Divider(color = Grey300)
         Button(
             onClick = {
-                val routine = Routine(
-                    enteredName.value.text,
-                    exerciseModel.exercises.toList(),
-                    muscleModel.muscles.toList()
+                repoModel.storeRoutineInDB(
+                    name = enteredName.value.text,
+                    exercises = exerciseModel.exercises.toList(),
+                    muscleGroups = muscleModel.muscles.toList()
                 )
-                Log.d(TAG, routine.toString())
                 enteredName.value = TextFieldValue("")
                 enteredInSearch.value = TextFieldValue("")
                 Toast.makeText(context, "Item Created", Toast.LENGTH_SHORT).show()
-                /*TODO*/
             },
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
@@ -106,22 +105,26 @@ fun SearchResults(
     addExercises: (Exercise) -> Unit,
     removeExercises: (Exercise) -> Unit,
     enteredText: MutableState<TextFieldValue>,
-    items: List<Exercise> = getSampleExercises()
+//    items: List<Exercise> = getSampleExercises()
+    repoModel: DatabaseViewModel = viewModel()
 ) {
+    val items = repoModel.retrieveExercisesFromDB().collectAsState(initial = listOf())
     var filteredItems: List<Exercise>
     LazyColumn(
-        modifier = Modifier.fillMaxWidth().heightIn(max = 228.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(max = 228.dp)
     ) {
         val searchedText = enteredText.value.text
         val resultList = ArrayList<Exercise>()
         filteredItems =
             if (searchedText.isEmpty()) {
-                for (item in items) {
+                for (item in items.value) {
                     resultList.add(item)
                 }
                 resultList
             } else {
-                for (item in items) {
+                for (item in items.value) {
                     if (item.name.lowercase(Locale.getDefault())
                             .contains(searchedText.lowercase(Locale.getDefault()))
                     ) {

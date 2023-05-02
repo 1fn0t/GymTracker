@@ -10,6 +10,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.gym.DatabaseViewModel
 import com.example.gym.Routine
 import com.example.gym.R
 import com.example.gym.ui.theme.Green100
@@ -20,6 +22,7 @@ import com.example.gym.ui.theme.Green700
 @Composable
 fun RoutineDetailsScreen(
     routine: Routine,
+    repoModel: DatabaseViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -42,7 +45,9 @@ fun RoutineDetailsScreen(
                     contentDescription = stringResource(R.string.edit_routine),
                 )
             }
-            FilledTonalIconButton(onClick = { /*TODO*/ },
+            FilledTonalIconButton(onClick = {
+                                            repoModel.deleteRoutineInDB(routine)
+            },
                 modifier = Modifier.size(64.dp)
                 ) {
                 Icon(painter = painterResource(R.drawable.baseline_delete_24),

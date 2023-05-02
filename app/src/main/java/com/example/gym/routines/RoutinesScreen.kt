@@ -6,10 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,9 +16,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gym.*
 import com.example.gym.R
+import com.example.gym.database.TrackerRepository
+import com.example.gym.navigation.NavViewModel
 import com.example.gym.ui.theme.Green700
 import com.example.gym.ui.theme.Grey300
 import com.example.gym.ui.theme.Grey500
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 
 private const val TAG = "Routines Screen"
 
@@ -29,10 +30,12 @@ private const val TAG = "Routines Screen"
 fun RoutinesScreen(
     switchToDetails: (Routine) -> Unit,
     switchToNestedScreen: (Int) -> Unit,
+    repoModel: DatabaseViewModel = viewModel(),
     muscleModel: MuscleViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
-    val mockRoutines = getSampleRoutines()
+//    val mockRoutines = getSampleRoutines()
+    val routines = repoModel.retrieveRoutinesFromDB().collectAsState(initial = listOf())
     var enteredText = remember { mutableStateOf(TextFieldValue("")) }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -50,13 +53,7 @@ fun RoutinesScreen(
                     text = stringResource(R.string.add_routine)
                 )
             }
-            ElevatedButton(onClick = {
-                val newExercise = Exercise(
-                    name = enteredText.value.text,
-                    muscleGroups = muscleModel.muscles.toList()
-                )
-                Log.d(TAG, newExercise.toString())
-            },
+            ElevatedButton(onClick = { repoModel.storeExerciseInDB(enteredText.value.text, muscleModel.muscles.toList()) },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Green700,
                     contentColor = Color.White
@@ -77,7 +74,7 @@ fun RoutinesScreen(
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            itemsIndexed(mockRoutines) { _, item ->
+            itemsIndexed(routines.value) { _, item ->
                 RoutinesItem(
                     name = item.name,
                     muscleGroups = item.muscleGroups,

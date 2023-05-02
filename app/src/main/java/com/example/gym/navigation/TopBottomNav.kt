@@ -1,4 +1,4 @@
-package com.example.gym
+package com.example.gym.navigation
 
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import com.example.gym.NavIcon
+import com.example.gym.R
 import com.example.gym.ui.theme.Green700
 import com.example.gym.ui.theme.Green900
 
