@@ -9,9 +9,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.fontResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.example.gym.MuscleGroup
+import com.example.gym.R
 import com.example.gym.getSampleMuscles
 
 
@@ -49,7 +51,9 @@ fun MuscleCheckboxes(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    group.type.toString().lowercase().capitalize(),
+                    text = group.type.toString().lowercase().capitalize(),
+                    style = MaterialTheme.typography.bodyLarge,
+//                    font = R.font.kulim_park_regular,
                     modifier = Modifier
                         .width(104.dp)
                         .align(Alignment.CenterVertically)
@@ -63,7 +67,9 @@ fun MuscleCheckboxes(
                             modifier = Modifier.padding(horizontal = 8.dp)
                         ) {
                             Text(
-                                muscle,
+                                text = muscle,
+//                                fontFamily = R.font.kulim_park_light,
+                                style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.width(120.dp)
                             )
                             Checkbox(checked = checked, onCheckedChange = { current ->

@@ -40,58 +40,67 @@ fun RoutinesScreen(
 ) {
     val routines = repoModel.retrieveRoutinesFromDB().collectAsState(initial = listOf())
     var enteredText = remember { mutableStateOf(TextFieldValue("")) }
-    Column(
+    LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = modifier
+        modifier = modifier.padding(horizontal = 24.dp)
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp)
-        ) {
-            OutlinedButton(onClick = {
-                navModel.switchScreen(Screen.AddRoutine)
-                navController.navigate(Screen.AddRoutine.route)
-            }) {
-                Text(
-                    text = stringResource(R.string.add_routine)
-                )
-            }
-            ElevatedButton(onClick = { repoModel.storeExerciseInDB(enteredText.value.text, muscleModel.muscles.toList()) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Green700,
-                    contentColor = Color.White
-                )
+        item {
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)
             ) {
-                Text(
-                    text = stringResource(R.string.create_exercises)
-                )
+                OutlinedButton(onClick = {
+                    navModel.switchScreen(Screen.AddRoutine)
+                    navController.navigate(Screen.AddRoutine.route)
+                }) {
+                    Text(
+                        text = stringResource(R.string.add_routine),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+                ElevatedButton(onClick = { repoModel.storeExerciseInDB(enteredText.value.text, muscleModel.muscles.toList()) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Green700,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.create_exercises),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
             }
         }
-        NameTextField(enteredName = enteredText, labelText = "Enter exercise name")
-        Divider(color = Grey300)
-        MuscleCheckboxes(addMuscles = { muscle -> muscleModel.addMuscle(muscle) },
-            removeMuscles = { muscle -> muscleModel.removeMuscle(muscle) },
-            modifier = Modifier.padding(horizontal = 8.dp)
+        item {
+            NameTextField(enteredName = enteredText, labelText = "Enter exercise name")
+        }
+        item {
+            Divider(color = Grey300)
+            MuscleCheckboxes(addMuscles = { muscle -> muscleModel.addMuscle(muscle) },
+                removeMuscles = { muscle -> muscleModel.removeMuscle(muscle) },
             )
-        Divider(color = Grey500)
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            itemsIndexed(routines.value) { _, item ->
-                RoutinesItem(
-                    name = item.name,
-                    muscleGroups = item.muscleGroups,
-                    showDetails = {
+            Divider(color = Grey500)
+        }
+        item {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                routines.value.forEachIndexed { _, item ->
+                    RoutinesItem(
+                        name = item.name,
+                        muscleGroups = item.muscleGroups,
+                        showDetails = {
 //                        switchToDetails(item)
 //                        navModel.switchWithArgs(Screen.RoutineDetails, item.name, item.name)
-                        navModel.switchScreen(Screen.RoutineDetails)
-                        navModel.updateTopBarText(item.name)
-                        navController.navigate(Screen.RoutineDetails.withArgs(item.name))
-                    }
-                )
+                            navModel.switchScreen(Screen.RoutineDetails)
+                            navModel.updateTopBarText(item.name)
+                            navController.navigate(Screen.RoutineDetails.withArgs(item.name))
+                        }
+                    )
+                }
             }
         }
     }
@@ -116,10 +125,12 @@ fun RoutinesItem(
             }
     ) {
         Text(
-            text = name
+            text = name,
+            style = MaterialTheme.typography.headlineSmall
         )
         Text(
-            text = "Muscles Targeted: " + formatElementsInOneLine(muscleGroups)
+            text = "Muscles Targeted: " + formatElementsInOneLine(muscleGroups),
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }

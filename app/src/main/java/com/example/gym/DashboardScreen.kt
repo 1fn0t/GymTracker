@@ -9,9 +9,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
-import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.TextField
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -21,12 +19,14 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import com.example.gym.routines.formatElementsInOneLine
+import com.example.gym.ui.theme.Grey500
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
     repoModel: DatabaseViewModel,
@@ -41,32 +41,40 @@ fun DashboardScreen(
     }
     var sessions = repoModel.retrieveMostRecentSessionEntriesFromDB().collectAsState(initial = listOf())
     LazyColumn(
-        verticalArrangement = Arrangement.SpaceEvenly,
-        modifier = modifier.padding(horizontal = 8.dp).fillMaxWidth()
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+            .padding(horizontal = 8.dp)
+            .fillMaxWidth()
     ) {
         item {
-            Text("Add new results")
-            Text("Choose a routine")
+            Divider(color = Grey500)
+            Text(text = "Choose a routine", style = MaterialTheme.typography.headlineMedium)
         }
-        itemsIndexed(routines.value) { _, routine ->
-            OutlinedButton(onClick = {
-                if (!clicked) {
-                    clicked = true
-                    selectedRoutine = routine
-                } else if (selectedRoutine == routine) {
-                    selectedRoutine = null
-                    clicked = false
-                }
-            }) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Box {
-                        Text(text = routine.name)
+        item {
+            routines.value.forEachIndexed { _, routine ->
+                OutlinedCard(onClick = {
+                    if (!clicked) {
+                        clicked = true
+                        selectedRoutine = routine
+                    } else if (selectedRoutine == routine) {
+                        selectedRoutine = null
+                        clicked = false
                     }
-                    Box {
-                        Text(text = formatElementsInOneLine(routine.muscleGroups))
+                }) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp)
+                    ) {
+                        Box (
+                            modifier = Modifier.fillMaxWidth(0.2f)
+                        ){
+                            Text(text = routine.name, style = MaterialTheme.typography.bodyMedium)
+                        }
+                        Box (
+                            modifier = Modifier.fillMaxWidth(0.8f)
+                        ){
+                            Text(text = formatElementsInOneLine(routine.muscleGroups))
+                        }
                     }
                 }
             }
@@ -75,6 +83,7 @@ fun DashboardScreen(
             if (clicked) {
                 selectedRoutine?.let {
                     Column() {
+                        Divider(color = Grey500)
                         var textFields = remember { (List(it.exercises.size) {TextFieldValue("")}).toMutableStateList() }
 //                        var textFields = mutableListOf<TextFieldValue>()
 //                        remember {
@@ -85,7 +94,7 @@ fun DashboardScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
 //                                var enteredCount = remember { mutableStateOf(TextFieldValue("")) }
-                                Text(text = exercise.name, modifier = Modifier.width(196.dp))
+                                Text(text = exercise.name, modifier = Modifier.width(196.dp), style = MaterialTheme.typography.headlineSmall)
                                 OutlinedTextField(
                                     value = textFields[index].text,
                                     onValueChange = { currentEntered ->
@@ -127,7 +136,8 @@ fun DashboardScreen(
             }
         }
         item {
-            Text("Last Sessions")
+            Divider(color = Grey500)
+            Text(text = "Last Sessions", style = MaterialTheme.typography.headlineMedium)
         }
         itemsIndexed(sessions.value) { index, session ->
             Column(
@@ -138,10 +148,11 @@ fun DashboardScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Box {
-                        Text(session.routineName)
+                        Text(text = session.routineName, style = MaterialTheme.typography.headlineSmall)
                     }
                     Box {
-                        Text("${session.dateCreated.month.name.toLowerCase().capitalize()} ${session.dateCreated.dayOfMonth}")
+                        Text(text = "${session.dateCreated.month.name.toLowerCase().capitalize()} ${session.dateCreated.dayOfMonth}",
+                            style = MaterialTheme.typography.bodySmall)
                     }
                 }
                 Row(
@@ -150,7 +161,7 @@ fun DashboardScreen(
                 ) {
                     session.repCounts.forEach {
                         Box {
-                            Text(it.toString())
+                            Text(text = it.toString(), style = MaterialTheme.typography.bodyMedium)
                         }
                     }
                 }

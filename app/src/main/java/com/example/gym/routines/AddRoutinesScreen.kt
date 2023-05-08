@@ -1,23 +1,18 @@
 package com.example.gym.routines
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gym.*
 import com.example.gym.R
@@ -38,40 +33,58 @@ fun AddRoutinesScreen(
 //    val scrollState = rememberScrollState()
     var enteredName = remember { mutableStateOf(TextFieldValue("")) }
     val enteredInSearch = remember { mutableStateOf(TextFieldValue("")) }
-    Column(
+    LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
 //            .verticalScroll(scrollState)
             .padding(8.dp)
     ) {
-        NameTextField(
-            enteredName = enteredName,
-            labelText = "Enter routine name",
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-        Divider(color = Grey300)
-        Text(text = "Check the muscles targeted")
-        MuscleCheckboxes(
-            addMuscles = { muscle -> muscleModel.addMuscle(muscle) },
-            removeMuscles = { muscle -> muscleModel.removeMuscle(muscle) }
-        )
-        Divider(color = Grey500)
-        SearchComponent(enteredInSearch = enteredInSearch, exerciseModel = exerciseModel, repoModel = repoModel)
-        Divider(color = Grey300)
-        Button(
-            onClick = {
-                repoModel.storeRoutineInDB(
-                    name = enteredName.value.text,
-                    exercises = exerciseModel.exercises.toList(),
-                    muscleGroups = muscleModel.muscles.toList()
+        item {
+            Box (
+                modifier = Modifier.fillMaxWidth()
+                    ){
+                NameTextField(
+                    enteredName = enteredName,
+                    labelText = "Enter routine name",
+                    modifier = Modifier.align(Alignment.Center)
                 )
-                enteredName.value = TextFieldValue("")
-                enteredInSearch.value = TextFieldValue("")
-                Toast.makeText(context, "Item Created", Toast.LENGTH_SHORT).show()
-            },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Text("Create Routine")
+            }
+        }
+        item {
+            Divider(color = Grey300)
+            Text(text = "Check the muscles targeted")
+        }
+        item {
+            MuscleCheckboxes(
+                addMuscles = { muscle -> muscleModel.addMuscle(muscle) },
+                removeMuscles = { muscle -> muscleModel.removeMuscle(muscle) }
+            )
+        }
+        item {
+            Divider(color = Grey500)
+            SearchComponent(enteredInSearch = enteredInSearch, exerciseModel = exerciseModel, repoModel = repoModel)
+            Divider(color = Grey300)
+        }
+        item {
+            Box (
+                modifier = Modifier.fillMaxWidth()
+                    ){
+                Button(
+                    onClick = {
+                        repoModel.storeRoutineInDB(
+                            name = enteredName.value.text,
+                            exercises = exerciseModel.exercises.toList(),
+                            muscleGroups = muscleModel.muscles.toList()
+                        )
+                        enteredName.value = TextFieldValue("")
+                        enteredInSearch.value = TextFieldValue("")
+                        Toast.makeText(context, "Item Created", Toast.LENGTH_SHORT).show()
+                    },
+                    modifier = Modifier.align(Alignment.Center)
+                ) {
+                    Text(text = "Create Routine", style = MaterialTheme.typography.labelMedium)
+                }
+            }
         }
     }
     DisposableEffect(Unit) {

@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Colors
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -106,9 +107,10 @@ fun StatisticsScreen(
     val test1 = listOf(entriesOf(1f, 4f, 6f), entriesOf(5f, 10f, 4f))
     val chartEntryModel2 = entryModelOf(*test1.toTypedArray())
     Column(
-        modifier = modifier.padding(top = 32.dp, start = 24.dp, end= 24.dp)
+        modifier = modifier.padding(top = 16.dp, start = 24.dp, end= 24.dp)
     ) {
-        Text(text = "Progress Charts", modifier = Modifier.padding(vertical = 16.dp))
+        Text(text = "Progress Charts", style = MaterialTheme.typography.headlineLarge,
+            modifier = Modifier.padding(vertical = 16.dp))
         LazyRow (
             horizontalArrangement = Arrangement.spacedBy(48.dp)
                 ){
@@ -117,7 +119,7 @@ fun StatisticsScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = foundRoutines[index])
+                    Text(text = foundRoutines[index], style = MaterialTheme.typography.headlineMedium)
                     val chartColors by remember {
                         mutableStateOf(randomListColors(item.entries.size))
                     }
@@ -223,7 +225,7 @@ private fun rememberLegend(chartColors: List<Color>, exerciseNames: List<String>
     padding = legendPadding,
 )
 
-private val legendItemLabelTextSize = 12.sp
+private val legendItemLabelTextSize = 18.sp
 private val legendItemIconSize = 8.dp
 private val legendItemIconPaddingValue = 10.dp
 private val legendItemSpacing = 4.dp
