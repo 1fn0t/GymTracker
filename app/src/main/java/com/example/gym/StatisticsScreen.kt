@@ -55,22 +55,17 @@ fun StatisticsScreen(
     modifier: Modifier = Modifier
 ) {
     val sessions = repoModel.retrieveSessionsWithinMonthFromDB().collectAsState(initial = listOf())
-//    var statistics by remember {
-//        mutableStateOf(mutableListOf<SessionStatistic>())
-//    }
     var foundRoutines by remember {
         mutableStateOf(mutableListOf<String>())
     }
-//    var routinesMap by remember {
-//        mutableStateOf(mutableMapOf<String, List<String>>())
-//    }
+    var routinesMap by remember {
+        mutableStateOf(mutableMapOf<String, List<String>>())
+    }
     var entryModels by remember {
         mutableStateOf(emptyList<ChartEntryModel>())
     }
-//    val entries by remember { mutableStateOf(mutableListOf<List<FloatEntry>>()) }
     LaunchedEffect(key1 = sessions.value) {
         var statistics = mutableListOf<SessionStatistic>()
-//        var foundRoutines = mutableListOf<String>()
         sessions.value.forEach { entry ->
                 val index = foundRoutines.indexOf(entry.routineName)
                 if (index != -1) {
@@ -97,45 +92,36 @@ fun StatisticsScreen(
         var newModels = mutableListOf<ChartEntryModel>()
         statistics.forEach { statistic ->
             val entries = mutableListOf<List<FloatEntry>>()
+            var listExercises = mutableListOf<String>()
             statistic.exerciseStatistics.forEach {
+                listExercises.add(it.exerciseName)
                 entries.add(it.repCounts.mapIndexed { index, count -> FloatEntry(index.toFloat(), count) })
             }
+            routinesMap.put(statistic.routineName, listExercises)
             newModels.add(entryModelOf(*entries.toTypedArray()))
         }
         entryModels = newModels
         Log.d("Statistics Screen", statistics.toString())
     }
     val test1 = listOf(entriesOf(1f, 4f, 6f), entriesOf(5f, 10f, 4f))
-//    val test2 = listOf(entriesOf(1f, 4f, 6f), entriesOf(5f, 10f, 4f))
-//    val test3 = listOf(entriesOf(1f, 4f, 6f), entriesOf(5f, 10f, 4f))
-//
-//    val chartEntryModel = entryModelOf(*entries.toTypedArray())
     val chartEntryModel2 = entryModelOf(*test1.toTypedArray())
-//    val chartEntryModels2 by remember {
-//        mutableStateOf(listOf(entryModelOf(*test1.toTypedArray()), entryModelOf(*test2.toTypedArray()), entryModelOf(*test3.toTypedArray())))
-//    }
     Column(
-        modifier = modifier
+        modifier = modifier.padding(top = 32.dp, start = 24.dp, end= 24.dp)
     ) {
+        Text(text = "Progress Charts", modifier = Modifier.padding(vertical = 16.dp))
         LazyRow (
             horizontalArrangement = Arrangement.spacedBy(48.dp)
                 ){
-            Log.d("From outsidee Lazy", "Hello")
             itemsIndexed(entryModels) { index, item ->
-                Log.d("From Lazy", "Hello")
-//                val entries by remember { mutableStateOf(mutableListOf<List<FloatEntry>>()) }
-//                LaunchedEffect(key1 = item) {
-//                    statistics[index].exerciseStatistics.forEach {
-//                        entries.add(it.repCounts.mapIndexed { index, count -> FloatEntry(index.toFloat(), count) })
-//                    }
-//                }
-//                val chartEntryModel = entryModelOf(*entries.toTypedArray())
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = foundRoutines[index])
-                    ProvideChartStyle(rememberChartStyle(randomListColors(item.entries.size))) {
+                    val chartColors by remember {
+                        mutableStateOf(randomListColors(item.entries.size))
+                    }
+                    ProvideChartStyle(rememberChartStyle(chartColors)) {
                         val defaultLines = currentChartStyle.lineChart.lines
                         Chart(
                             chart = lineChart(
@@ -148,18 +134,14 @@ fun StatisticsScreen(
                                 horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside
                             ),
                             bottomAxis = bottomAxis(),
-                            modifier = Modifier.width(360.dp)
+                            legend = routinesMap.get(foundRoutines[index])
+                                ?.let { rememberLegend(chartColors, it) },
+                            modifier = Modifier.width(340.dp).height(280.dp)
                         )
                     }
                 }
             }
         }
-        Chart(
-            chart = LineChart(),
-            model = chartEntryModel2,
-            startAxis = startAxis(),
-            bottomAxis = bottomAxis(),
-        )
     }
 }
 
