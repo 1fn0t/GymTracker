@@ -9,10 +9,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.gym.database.StatisticsScreen
 import com.example.gym.database.TrackerRepository
-import com.example.gym.navigation.AppBar
-import com.example.gym.navigation.GymTrackNavigation
-import com.example.gym.navigation.NavViewModel
+import com.example.gym.navigation.*
 import com.example.gym.routines.AddRoutinesScreen
 import com.example.gym.routines.RoutineDetailsScreen
 import com.example.gym.routines.RoutinesScreen
@@ -32,54 +36,61 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             GymTheme {
-                // A surface container using the 'background' color from the theme
                 val navModel: NavViewModel = viewModel()
+                val navController = rememberNavController()
+                val databaseModel: DatabaseViewModel = viewModel()
                 Scaffold(
                     bottomBar = {
-                        GymTrackNavigation(selectNavItem = { item ->
-                            navModel.switchScreen(item)
-                        },
-                        currentScreen = navModel.currentScreen
-                            )
+                        GymTrackNavigation(
+                            switchScreen = { screen -> navModel.switchScreen(screen) },
+                            navController = navController
+                        )
                     },
                     topBar = {
                         AppBar(
                             barText = navModel.appBarText,
                             backBtnEnabled = navModel.backButtonEnabled,
                             backBtnColor = navModel.backButtonColor,
-                            goBackToScreen = { navModel.switchBackToScreen() }
+                            goBackToScreen = { navModel.switchBackToScreen() },
+                            navController = navController
                         )
                     }
                 ) { paddingValues ->
                     val mod = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                    when (navModel.currentScreen) {
-                        NavViewModel.SCREENCONTANTS.DASHBOARD -> {
-                            Text(text ="Dashboard", modifier = mod)
+                    NavHost(navController = navController, startDestination = Screen.Dashboard.route) {
+                        composable(route = Screen.Dashboard.route) {
+                            DashboardScreen(repoModel = databaseModel, mod)
                         }
-                        NavViewModel.SCREENCONTANTS.ROUTINES -> {
-                            RoutinesScreen(switchToDetails = { item -> navModel.switchToDetails(item) },
-                                switchToNestedScreen = { num -> navModel.switchToNestedScreen(num) },
-//                                trackerRepo = trackerRepo,
+                        composable(route = Screen.Profile.route) {
+                            Text(text ="Profile", mod)
+                        }
+                        composable(route = Screen.Stats.route) {
+                            StatisticsScreen(repoModel = databaseModel, modifier = mod)
+                        }
+                        composable(route = Screen.Routines.route) {
+                            RoutinesScreen(navModel = navModel, navController = navController, repoModel = databaseModel,
                                 modifier = mod)
-//                            Text(text ="Routines", modifier = mod)
                         }
-                        NavViewModel.SCREENCONTANTS.STATS -> {
-                            Text(text ="Stats", modifier = mod)
+                        composable(
+                            route = Screen.RoutineDetails.route + "/{detailName}",
+                            arguments = listOf(
+                                navArgument("detailName") {
+                                    type = NavType.StringType
+                                    defaultValue = "Error"
+                                    nullable = true
+                                }
+                            )
+                        ) { entry ->
+                            RoutineDetailsScreen(detailName = entry.arguments?.getString("detailName"),
+                                repoModel = databaseModel, navController = navController, navModel = navModel, modifier =mod)
                         }
-                        NavViewModel.SCREENCONTANTS.PROFILE -> {
-                            Text(text ="Profile", modifier = mod)
-                        }
-                        NavViewModel.SCREENCONTANTS.ROUTINE_DETAILS -> {
-                            RoutineDetailsScreen(routine = getSampleRoutine(), modifier = mod)
-                        }
-                        NavViewModel.SCREENCONTANTS.ADD_ROUTINES -> {
-                            AddRoutinesScreen(this, modifier = mod)
+                        composable(route = Screen.AddRoutine.route) {
+                            AddRoutinesScreen(context = this@MainActivity, repoModel = databaseModel, modifier = mod)
                         }
                     }
                 }
-
             }
         }
     }

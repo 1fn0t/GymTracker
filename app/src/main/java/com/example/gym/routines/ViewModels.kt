@@ -27,6 +27,9 @@ class ExerciseViewModel: ViewModel() {
     fun addExercise(exercise: Exercise) {
         _exercises.add(exercise)
     }
+    fun addAllExercises(exercises: List<Exercise>) {
+        _exercises.addAll(exercises)
+    }
     fun removeExercise(exercise: Exercise) {
         _exercises.remove(exercise)
     }

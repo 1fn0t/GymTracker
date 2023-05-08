@@ -14,13 +14,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.gym.*
 import com.example.gym.R
 import com.example.gym.database.TrackerRepository
 import com.example.gym.navigation.NavViewModel
+import com.example.gym.navigation.Screen
 import com.example.gym.ui.theme.Green700
 import com.example.gym.ui.theme.Grey300
 import com.example.gym.ui.theme.Grey500
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 
@@ -28,13 +31,13 @@ private const val TAG = "Routines Screen"
 
 @Composable
 fun RoutinesScreen(
-    switchToDetails: (Routine) -> Unit,
-    switchToNestedScreen: (Int) -> Unit,
-    repoModel: DatabaseViewModel = viewModel(),
+    navModel: NavViewModel,
+    navController: NavController,
+//    repoModel: DatabaseViewModel = viewModel(),
+    repoModel: DatabaseViewModel,
     muscleModel: MuscleViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
-//    val mockRoutines = getSampleRoutines()
     val routines = repoModel.retrieveRoutinesFromDB().collectAsState(initial = listOf())
     var enteredText = remember { mutableStateOf(TextFieldValue("")) }
     Column(
@@ -48,7 +51,10 @@ fun RoutinesScreen(
                 .fillMaxWidth()
                 .padding(vertical = 16.dp)
         ) {
-            OutlinedButton(onClick = { switchToNestedScreen(NavViewModel.SCREENCONTANTS.ADD_ROUTINES) }) {
+            OutlinedButton(onClick = {
+                navModel.switchScreen(Screen.AddRoutine)
+                navController.navigate(Screen.AddRoutine.route)
+            }) {
                 Text(
                     text = stringResource(R.string.add_routine)
                 )
@@ -78,7 +84,13 @@ fun RoutinesScreen(
                 RoutinesItem(
                     name = item.name,
                     muscleGroups = item.muscleGroups,
-                    showDetails = { switchToDetails(item) }
+                    showDetails = {
+//                        switchToDetails(item)
+//                        navModel.switchWithArgs(Screen.RoutineDetails, item.name, item.name)
+                        navModel.switchScreen(Screen.RoutineDetails)
+                        navModel.updateTopBarText(item.name)
+                        navController.navigate(Screen.RoutineDetails.withArgs(item.name))
+                    }
                 )
             }
         }
@@ -98,7 +110,7 @@ fun RoutinesItem(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier
+        modifier = modifier.fillMaxWidth()
             .clickable {
                 showDetails()
             }

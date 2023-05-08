@@ -32,7 +32,7 @@ fun AddRoutinesScreen(
     context: Context,
     exerciseModel: ExerciseViewModel = viewModel(),
     muscleModel: MuscleViewModel = viewModel(),
-    repoModel: DatabaseViewModel = viewModel(),
+    repoModel: DatabaseViewModel,
     modifier: Modifier = Modifier
 ) {
 //    val scrollState = rememberScrollState()
@@ -56,25 +56,7 @@ fun AddRoutinesScreen(
             removeMuscles = { muscle -> muscleModel.removeMuscle(muscle) }
         )
         Divider(color = Grey500)
-        Text(text = "Add Exercises")
-        TextField(
-            value = enteredInSearch.value,
-            onValueChange = { currentEntered -> enteredInSearch.value = currentEntered },
-            label = { Text("Search for exercise") },
-            trailingIcon = {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_search_24),
-                    contentDescription = null
-                )
-            },
-            singleLine = true,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-        SearchResults(
-            addExercises = { exercise -> exerciseModel.addExercise(exercise) },
-            removeExercises = { exercise -> exerciseModel.removeExercise(exercise) },
-            enteredText = enteredInSearch
-        )
+        SearchComponent(enteredInSearch = enteredInSearch, exerciseModel = exerciseModel, repoModel = repoModel)
         Divider(color = Grey300)
         Button(
             onClick = {
@@ -101,12 +83,39 @@ fun AddRoutinesScreen(
 }
 
 @Composable
+fun SearchComponent(enteredInSearch: MutableState<TextFieldValue>, exerciseModel: ExerciseViewModel, repoModel: DatabaseViewModel) {
+    Column {
+        Text(text = "Add Exercises")
+        TextField(
+            value = enteredInSearch.value,
+            onValueChange = { currentEntered -> enteredInSearch.value = currentEntered },
+            label = { Text("Search for exercise") },
+            trailingIcon = {
+                Icon(
+                    painter = painterResource(R.drawable.baseline_search_24),
+                    contentDescription = null
+                )
+            },
+            singleLine = true,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+        SearchResults(
+            addExercises = { exercise -> exerciseModel.addExercise(exercise) },
+            removeExercises = { exercise -> exerciseModel.removeExercise(exercise) },
+            enteredText = enteredInSearch,
+            repoModel = repoModel
+        )
+    }
+
+}
+
+@Composable
 fun SearchResults(
     addExercises: (Exercise) -> Unit,
     removeExercises: (Exercise) -> Unit,
     enteredText: MutableState<TextFieldValue>,
 //    items: List<Exercise> = getSampleExercises()
-    repoModel: DatabaseViewModel = viewModel()
+    repoModel: DatabaseViewModel
 ) {
     val items = repoModel.retrieveExercisesFromDB().collectAsState(initial = listOf())
     var filteredItems: List<Exercise>

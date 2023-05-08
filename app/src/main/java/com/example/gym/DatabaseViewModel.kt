@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.gym.database.SessionItem
 import com.example.gym.database.TrackerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -45,6 +46,23 @@ class DatabaseViewModel  @Inject constructor(private val trackerRepo: TrackerRep
         }
     }
 
+//    fun retrieveRoutineById(id: String): Routine {
+//        val routineItem = trackerRepo.readRoutineById(id)
+//        return Routine(
+//            name = routineItem.name,
+//            exercises = routineItem.exercises,
+//            muscleGroups = routineItem.muscles
+//        )
+//    }
+    suspend fun retrieveRoutineByName(id: String): Routine {
+        val routineItem = trackerRepo.readRoutineByName(id)
+        return Routine(
+            name = routineItem.name,
+            exercises = routineItem.exercises,
+            muscleGroups = routineItem.muscles
+        )
+    }
+
     fun retrieveExercisesFromDB(): Flow<List<Exercise>> {
         return trackerRepo.readAllExerciseData.map { exerciseItems ->
             exerciseItems.map { exerciseItem ->
@@ -72,6 +90,42 @@ class DatabaseViewModel  @Inject constructor(private val trackerRepo: TrackerRep
             trackerRepo.deleteExercise(
                 exercise
             )
+        }
+    }
+
+    fun updateRoutineInDB(routine: Routine) {
+        viewModelScope.launch {
+            trackerRepo.updateRoutine(routine)
+        }
+    }
+
+    fun storeSessionEntryInDB(entry: SessionEntry) {
+        viewModelScope.launch {
+            trackerRepo.addSessionEntry(entry)
+        }
+    }
+
+    fun retrieveMostRecentSessionEntriesFromDB(): Flow<List<SessionEntry>> {
+        return trackerRepo.readMostRecentSessionEntries.map { sessions ->
+            sessions.map {
+                SessionEntry(
+                    routineName = it.routineName,
+                    repCounts = it.repCounts,
+                    dateCreated = it.dateCreated
+                )
+            }
+        }
+    }
+
+    fun retrieveSessionsWithinMonthFromDB(): Flow<List<SessionEntry>> {
+        return trackerRepo.readSessionsWithinMonth.map { sessions ->
+            sessions.map {
+                SessionEntry(
+                    routineName = it.routineName,
+                    repCounts = it.repCounts,
+                    dateCreated = it.dateCreated
+                )
+            }
         }
     }
 

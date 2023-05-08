@@ -1,14 +1,23 @@
 package com.example.gym.navigation
 
-//sealed class Screen(val route: String): BaseScreen() {
-//    object Dashboard : Screen("dashboard")
-//    object Routines : Screen("routines")
-//    object Stats: Screen("stats")
-//    object
-//}
-//
-//sealed class BaseScreen(val route: String) {
-//    object RoutineDetails : Screen("routine details")
+sealed class Screen(val route: String) {
+    object Dashboard : Screen("dashboard")
+    object Routines : Screen("routines")
+    object Stats: Screen("stats")
+    object Profile: Screen("profile")
+    object AddRoutine: Screen("add_routine")
+    object RoutineDetails: Screen("routine_details")
+
+    fun withArgs(vararg args: String): String {
+        return buildString {
+            append(route)
+            args.forEach { arg ->
+                append("/$arg")
+            }
+        }
+    }
+}
+
 //}
 //
 //

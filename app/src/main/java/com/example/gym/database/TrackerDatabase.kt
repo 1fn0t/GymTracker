@@ -5,9 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [ExerciseItem::class, RoutineItem::class], version = 1, exportSchema = false)
-@TypeConverters(StringConverters::class, ExerciseConverters::class)
+@Database(entities = [ExerciseItem::class, RoutineItem::class, SessionItem::class], version = 3, exportSchema = false)
+@TypeConverters(StringConverters::class, ExerciseConverters::class, DateConverters::class, IntegerConverters::class)
 abstract class TrackerDatabase : RoomDatabase() {
     abstract fun trackerDao(): TrackerDatabaseDao
 
@@ -23,7 +25,9 @@ abstract class TrackerDatabase : RoomDatabase() {
                         context.applicationContext,
                         TrackerDatabase::class.java,
                         "tracker_database"
-                    ).fallbackToDestructiveMigration()
+                    )
+//                        .addMigrations(MIGRATION_1_2)
+                        .fallbackToDestructiveMigration()
                         .build()
 
                     INSTANCE = instance
@@ -33,3 +37,10 @@ abstract class TrackerDatabase : RoomDatabase() {
         }
     }
 }
+
+//val MIGRATION_1_2 = object : Migration(1, 2) {
+//    override fun migrate(database: SupportSQLiteDatabase) {
+//        // Delete the old table
+//        database.execSQL("DROP TABLE IF EXISTS tracker_database")
+//    }
+//}

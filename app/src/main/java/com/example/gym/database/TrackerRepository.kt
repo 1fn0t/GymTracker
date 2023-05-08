@@ -2,6 +2,8 @@ package com.example.gym.database
 
 import com.example.gym.Exercise
 import com.example.gym.Routine
+import com.example.gym.SessionEntry
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class TrackerRepository @Inject constructor(
@@ -9,6 +11,8 @@ class TrackerRepository @Inject constructor(
 ) {
     val readAllExerciseData = trackerDatabaseDao.getAllExercises()
     val readAllRoutineData = trackerDatabaseDao.getAllRoutines()
+    val readMostRecentSessionEntries = trackerDatabaseDao.getMostRecentSessions()
+    val readSessionsWithinMonth = trackerDatabaseDao.getSessionsWithinMonth()
 
     suspend fun addExercise(item: Exercise) {
         trackerDatabaseDao.insert(
@@ -66,4 +70,25 @@ class TrackerRepository @Inject constructor(
             )
         )
     }
+
+//    fun readRoutineById(id: String): RoutineItem {
+//        return trackerDatabaseDao.getRoutineById(id)
+//    }
+    suspend fun readRoutineByName(name: String): RoutineItem {
+        return trackerDatabaseDao.getRoutineByName(name)
+    }
+
+    suspend fun addSessionEntry(entry: SessionEntry) {
+        trackerDatabaseDao.insert(
+            SessionItem(
+                routineName = entry.routineName,
+                repCounts = entry.repCounts,
+                dateCreated = entry.dateCreated,
+            )
+        )
+    }
+
+//    fun readMostRecentSessionEntries(): Flow<List<SessionItem>> {
+//        return trackerDatabaseDao.getMostRecentSessions()
+//    }
 }
