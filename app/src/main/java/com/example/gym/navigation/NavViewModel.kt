@@ -26,6 +26,8 @@ class NavViewModel(
     var backButtonColor by mutableStateOf(Color.Transparent)
         private set
     var lastScreen: Screen by mutableStateOf(Screen.Dashboard)
+    var signedIn by mutableStateOf(false)
+        private set
 
     fun switchScreen(screen: Screen) {
         lastScreen = currentScreen
@@ -69,6 +71,10 @@ class NavViewModel(
             else -> {}
         }
         return "Error"
+    }
+
+    fun updateSignIn(newState: Boolean) {
+        signedIn = newState
     }
 //    fun switchToDetails(routine: Routine) {
 //        appBarText = routine.name

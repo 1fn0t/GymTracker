@@ -21,6 +21,9 @@ import com.example.gym.routines.AddRoutinesScreen
 import com.example.gym.routines.RoutineDetailsScreen
 import com.example.gym.routines.RoutinesScreen
 import com.example.gym.ui.theme.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
@@ -30,64 +33,101 @@ private const val TAG = "Main Activity"
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var trackerRepo: TrackerRepository
+    override fun onStart() {
+        super.onStart()
+
+        // Check if user is signed in (non-null) and update UI accordingly.
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            signedIn = true
+        }
+    }
+
+    private lateinit var auth: FirebaseAuth
+    private var signedIn = false
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth = Firebase.auth
 
         setContent {
             GymTheme {
                 val navModel: NavViewModel = viewModel()
                 val navController = rememberNavController()
                 val databaseModel: DatabaseViewModel = viewModel()
-                Scaffold(
-                    bottomBar = {
-                        GymTrackNavigation(
-                            switchScreen = { screen -> navModel.switchScreen(screen) },
-                            navController = navController
-                        )
-                    },
-                    topBar = {
-                        AppBar(
-                            barText = navModel.appBarText,
-                            backBtnEnabled = navModel.backButtonEnabled,
-                            backBtnColor = navModel.backButtonColor,
-                            goBackToScreen = { navModel.switchBackToScreen() },
-                            navController = navController
-                        )
+                var mod: Modifier = Modifier.fillMaxSize()
+
+                LaunchedEffect(Unit) {
+                    navModel.updateSignIn(signedIn)
+                }
+
+                if (!navModel.signedIn) {
+                    NavHost(navController = navController, startDestination = Screen.SignIn.route) {
+                        composable(route = Screen.SignIn.route) {
+                            SignInScreen(auth = auth, navController = navController, navModel = navModel, mod)
+                        }
+                        composable(route = Screen.SignUp.route) {
+                            SignUpScreen(auth = auth, navController = navController, mod)
+                        }
                     }
-                ) { paddingValues ->
-                    val mod = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                    NavHost(navController = navController, startDestination = Screen.Dashboard.route) {
-                        composable(route = Screen.Dashboard.route) {
-                            DashboardScreen(repoModel = databaseModel, mod)
-                        }
-                        composable(route = Screen.Profile.route) {
-                            Text(text ="Profile", mod)
-                        }
-                        composable(route = Screen.Stats.route) {
-                            StatisticsScreen(repoModel = databaseModel, modifier = mod)
-                        }
-                        composable(route = Screen.Routines.route) {
-                            RoutinesScreen(navModel = navModel, navController = navController, repoModel = databaseModel,
-                                modifier = mod)
-                        }
-                        composable(
-                            route = Screen.RoutineDetails.route + "/{detailName}",
-                            arguments = listOf(
-                                navArgument("detailName") {
-                                    type = NavType.StringType
-                                    defaultValue = "Error"
-                                    nullable = true
-                                }
+
+//                    SignInScreen(auth = auth, navController = navController, mod)
+                } else {
+//                    navModel.updateSignIn(true)
+                    Scaffold(
+                        bottomBar = {
+                            GymTrackNavigation(
+                                switchScreen = { screen -> navModel.switchScreen(screen) },
+                                navController = navController
                             )
-                        ) { entry ->
-                            RoutineDetailsScreen(detailName = entry.arguments?.getString("detailName"),
-                                repoModel = databaseModel, navController = navController, navModel = navModel, modifier =mod)
+                        },
+                        topBar = {
+                            AppBar(
+                                barText = navModel.appBarText,
+                                backBtnEnabled = navModel.backButtonEnabled,
+                                backBtnColor = navModel.backButtonColor,
+                                goBackToScreen = { navModel.switchBackToScreen() },
+                                navController = navController
+                            )
                         }
-                        composable(route = Screen.AddRoutine.route) {
-                            AddRoutinesScreen(context = this@MainActivity, repoModel = databaseModel, modifier = mod)
+                    ) { paddingValues ->
+                        mod = mod
+                            .padding(paddingValues)
+                        NavHost(navController = navController, startDestination = Screen.Dashboard.route) {
+//                            composable(route = Screen.SingIn.route) {
+//                                SignInScreen(auth = auth, navController = navController, navModel = navModel, mod)
+////                                SignInScreen(auth = auth, navController = navController, mod)
+//                            }
+                            composable(route = Screen.Dashboard.route) {
+                                DashboardScreen(repoModel = databaseModel, mod)
+                            }
+                            composable(route = Screen.Profile.route) {
+                                ProfileScreen(auth = auth, navModel = navModel, mod)
+                            }
+                            composable(route = Screen.Stats.route) {
+                                StatisticsScreen(repoModel = databaseModel, modifier = mod)
+                            }
+                            composable(route = Screen.Routines.route) {
+                                RoutinesScreen(navModel = navModel, navController = navController, repoModel = databaseModel,
+                                    modifier = mod)
+                            }
+                            composable(
+                                route = Screen.RoutineDetails.route + "/{detailName}",
+                                arguments = listOf(
+                                    navArgument("detailName") {
+                                        type = NavType.StringType
+                                        defaultValue = "Error"
+                                        nullable = true
+                                    }
+                                )
+                            ) { entry ->
+                                RoutineDetailsScreen(detailName = entry.arguments?.getString("detailName"),
+                                    repoModel = databaseModel, navController = navController, navModel = navModel, modifier =mod)
+                            }
+                            composable(route = Screen.AddRoutine.route) {
+                                AddRoutinesScreen(context = this@MainActivity, repoModel = databaseModel, modifier = mod)
+                            }
                         }
                     }
                 }

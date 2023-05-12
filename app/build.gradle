@@ -4,8 +4,9 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
-
     id 'kotlin-parcelize'
+
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -95,10 +96,14 @@ dependencies {
 
     // For Jetpack Compose.
     implementation "com.patrykandpatrick.vico:compose:1.6.5"
-
     implementation('org.jetbrains.kotlin:kotlin-stdlib:1.8.10') {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
     }
+
+    // Firebase
+    implementation platform('com.google.firebase:firebase-bom:32.0.0')
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.firebase:firebase-firestore-ktx'
 }
 
 kapt {
