@@ -1,12 +1,10 @@
 package com.example.gym.database
 
-import android.text.Layout
 import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Colors
 import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -15,11 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Typeface
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.gym.DatabaseViewModel
 import com.example.gym.ExerciseStatistic
 import com.example.gym.SessionStatistic
 import com.patrykandpatrick.vico.compose.axis.horizontal.bottomAxis
@@ -114,6 +109,11 @@ fun StatisticsScreen(
         LazyRow (
             horizontalArrangement = Arrangement.spacedBy(48.dp)
                 ){
+            item {
+                if (entryModels.isEmpty()) {
+                    Text(text = "No available data to display", style = MaterialTheme.typography.headlineSmall)
+                }
+            }
             itemsIndexed(entryModels) { index, item ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,

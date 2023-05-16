@@ -1,7 +1,9 @@
-package com.example.gym.database
+package com.example.gym.database.hilt
 
 import android.content.Context
 import androidx.room.Room
+import com.example.gym.database.TrackerDatabase
+import com.example.gym.database.TrackerDatabaseDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -2,6 +2,7 @@ package com.example.gym
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.material3.*
@@ -13,11 +14,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.gym.navigation.NavViewModel
 import com.example.gym.navigation.Screen
-import com.example.gym.ui.theme.GymTheme
+import com.example.gym.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -92,7 +94,8 @@ fun SignInScreen(
             colors = ButtonDefaults.outlinedButtonColors(
                 containerColor = Color.White,
                 contentColor = Color.Blue
-            )
+            ),
+                border = BorderStroke(ButtonDefaults.outlinedButtonBorder.width, Green300)
                 ) {
                 Text(text = "Sign In")
             }
@@ -101,11 +104,12 @@ fun SignInScreen(
                              navController.navigate(Screen.SignUp.route)
             },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Black,
+                containerColor = BlueGray200,
                 contentColor = Color.White
-            )
+            ),
+//                border = BorderStroke(ButtonDefaults.outlinedButtonBorder.width, Color.Black)
                 ) {
-                Text(text = "Sign Up")
+                Text(text = "Sign Up", color = Color.White)
             }
         }
     }
@@ -181,7 +185,8 @@ fun SignUpScreen(
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = Color.White,
                     contentColor = Color.Blue
-                )
+                ),
+                border = BorderStroke(ButtonDefaults.outlinedButtonBorder.width, Green300)
             ) {
                 Text(text = "Sign Up")
             }
@@ -190,11 +195,12 @@ fun SignUpScreen(
                 navController.navigate(Screen.SignIn.route)
             },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black,
+                    containerColor = BlueGray200,
                     contentColor = Color.White
-                )
+                ),
+//                border = BorderStroke(ButtonDefaults.outlinedButtonBorder.width, Color.White)
             ) {
-                Text(text = "Sign In")
+                Text(text = "Sign In", color = Color.White)
             }
         }
     }
@@ -205,11 +211,13 @@ fun SignUpScreen(
 fun SignInPreview() {
     val auth = Firebase.auth
     val navController = rememberNavController()
+    val navModel: NavViewModel = viewModel()
     GymTheme {
-//        SignInScreen(
-//            auth = auth,
-//            navController = navController
-//        )
+        SignInScreen(
+            auth = auth,
+            navController = navController,
+            navModel = navModel
+        )
     }
 }
 

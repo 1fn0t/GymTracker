@@ -16,8 +16,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gym.*
 import com.example.gym.R
+import com.example.gym.database.DatabaseViewModel
 import com.example.gym.ui.theme.Grey300
 import com.example.gym.ui.theme.Grey500
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
 
 private const val TAG = "Add Routines Scope"
@@ -27,16 +29,16 @@ fun AddRoutinesScreen(
     context: Context,
     exerciseModel: ExerciseViewModel = viewModel(),
     muscleModel: MuscleViewModel = viewModel(),
+    firestoreDb: FirebaseFirestore,
+    uEmail: String?,
     repoModel: DatabaseViewModel,
     modifier: Modifier = Modifier
 ) {
-//    val scrollState = rememberScrollState()
     var enteredName = remember { mutableStateOf(TextFieldValue("")) }
     val enteredInSearch = remember { mutableStateOf(TextFieldValue("")) }
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
-//            .verticalScroll(scrollState)
             .padding(8.dp)
     ) {
         item {
@@ -76,6 +78,16 @@ fun AddRoutinesScreen(
                             exercises = exerciseModel.exercises.toList(),
                             muscleGroups = muscleModel.muscles.toList()
                         )
+                        uEmail?.let {
+                            firestoreDb.collection("data").document(it).collection("routine").document(enteredName.value.text)
+                                .set(
+                                    hashMapOf(
+                                        "name" to enteredName.value.text,
+                                        "exercises" to exerciseModel.exercises.toList(),
+                                        "muscleGroups" to muscleModel.muscles.toList()
+                                    )
+                                )
+                        }
                         enteredName.value = TextFieldValue("")
                         enteredInSearch.value = TextFieldValue("")
                         Toast.makeText(context, "Item Created", Toast.LENGTH_SHORT).show()
@@ -116,7 +128,8 @@ fun SearchComponent(enteredInSearch: MutableState<TextFieldValue>, exerciseModel
             addExercises = { exercise -> exerciseModel.addExercise(exercise) },
             removeExercises = { exercise -> exerciseModel.removeExercise(exercise) },
             enteredText = enteredInSearch,
-            repoModel = repoModel
+            repoModel = repoModel,
+            exerciseModel = exerciseModel,
         )
     }
 
@@ -127,8 +140,8 @@ fun SearchResults(
     addExercises: (Exercise) -> Unit,
     removeExercises: (Exercise) -> Unit,
     enteredText: MutableState<TextFieldValue>,
-//    items: List<Exercise> = getSampleExercises()
-    repoModel: DatabaseViewModel
+    repoModel: DatabaseViewModel,
+    exerciseModel: ExerciseViewModel
 ) {
     val items = repoModel.retrieveExercisesFromDB().collectAsState(initial = listOf())
     var filteredItems: List<Exercise>
@@ -156,8 +169,15 @@ fun SearchResults(
                 resultList
             }
         itemsIndexed(filteredItems) { _, filteredItem ->
+//            var initialState by remember { mutableStateOf(false) }
+//            LaunchedEffect(key1 = Unit) {
+//                if (exerciseModel.exercises.contains(filteredItem)) {
+//                    initialState = true
+//                }
+//            }
             SearchResultsItem(
                 itemText = filteredItem.name,
+//                itemInitialState = initialState,
                 onItemClick = { selected ->
                     if (selected) addExercises(filteredItem)
                     else removeExercises(filteredItem)
@@ -171,9 +191,12 @@ fun SearchResults(
 @Composable
 fun SearchResultsItem(
     itemText: String,
+//    itemInitialState: Boolean = false,
     onItemClick: (Boolean) -> Unit,
 ) {
+//    var selected by rememberSaveable { mutableStateOf(itemInitialState) }
     var selected by rememberSaveable { mutableStateOf(false) }
+
     Card(
         onClick = {
             selected = !selected

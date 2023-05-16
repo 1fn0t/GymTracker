@@ -5,8 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.gym.database.converters.DateConverters
+import com.example.gym.database.converters.ExerciseConverters
+import com.example.gym.database.converters.IntegerConverters
+import com.example.gym.database.converters.StringConverters
 
 @Database(entities = [ExerciseItem::class, RoutineItem::class, SessionItem::class], version = 3, exportSchema = false)
 @TypeConverters(StringConverters::class, ExerciseConverters::class, DateConverters::class, IntegerConverters::class)
@@ -26,7 +28,6 @@ abstract class TrackerDatabase : RoomDatabase() {
                         TrackerDatabase::class.java,
                         "tracker_database"
                     )
-//                        .addMigrations(MIGRATION_1_2)
                         .fallbackToDestructiveMigration()
                         .build()
 

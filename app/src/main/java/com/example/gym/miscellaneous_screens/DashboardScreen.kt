@@ -3,26 +3,20 @@ package com.example.gym
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
+import com.example.gym.database.DatabaseViewModel
 import com.example.gym.routines.formatElementsInOneLine
 import com.example.gym.ui.theme.Grey500
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -47,10 +41,13 @@ fun DashboardScreen(
             .fillMaxWidth()
     ) {
         item {
-            Divider(color = Grey500)
+            Spacer(Modifier.height(16.dp))
             Text(text = "Choose a routine", style = MaterialTheme.typography.headlineMedium)
         }
         item {
+            if (routines.value.isEmpty()) {
+                Text(text = "No available routines", style = MaterialTheme.typography.headlineSmall)
+            }
             routines.value.forEachIndexed { _, routine ->
                 OutlinedCard(onClick = {
                     if (!clicked) {
@@ -138,6 +135,11 @@ fun DashboardScreen(
         item {
             Divider(color = Grey500)
             Text(text = "Last Sessions", style = MaterialTheme.typography.headlineMedium)
+        }
+        item {
+            if (sessions.value.isEmpty()) {
+                Text(text = "No available sessions", style = MaterialTheme.typography.headlineSmall)
+            }
         }
         itemsIndexed(sessions.value) { index, session ->
             Column(

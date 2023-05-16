@@ -1,16 +1,15 @@
-package com.example.gym
+package com.example.gym.database
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gym.database.SessionItem
-import com.example.gym.database.TrackerRepository
+import com.example.gym.Exercise
+import com.example.gym.Routine
+import com.example.gym.SessionEntry
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -128,5 +127,4 @@ class DatabaseViewModel  @Inject constructor(private val trackerRepo: TrackerRep
             }
         }
     }
-
 }

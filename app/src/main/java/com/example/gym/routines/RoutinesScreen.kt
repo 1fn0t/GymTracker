@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,17 +14,15 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.gym.*
 import com.example.gym.R
-import com.example.gym.database.TrackerRepository
+import com.example.gym.database.DatabaseViewModel
 import com.example.gym.navigation.NavViewModel
 import com.example.gym.navigation.Screen
 import com.example.gym.ui.theme.Green700
 import com.example.gym.ui.theme.Grey300
 import com.example.gym.ui.theme.Grey500
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
 
 private const val TAG = "Routines Screen"
 
@@ -33,7 +30,8 @@ private const val TAG = "Routines Screen"
 fun RoutinesScreen(
     navModel: NavViewModel,
     navController: NavController,
-//    repoModel: DatabaseViewModel = viewModel(),
+    firestoreDb: FirebaseFirestore,
+    uEmail: String?,
     repoModel: DatabaseViewModel,
     muscleModel: MuscleViewModel = viewModel(),
     modifier: Modifier = Modifier
@@ -61,7 +59,20 @@ fun RoutinesScreen(
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
-                ElevatedButton(onClick = { repoModel.storeExerciseInDB(enteredText.value.text, muscleModel.muscles.toList()) },
+                ElevatedButton(onClick = {
+                    repoModel.storeExerciseInDB(enteredText.value.text, muscleModel.muscles.toList())
+                    uEmail?.let {
+                        firestoreDb.collection("data").document(it).collection("exercise").document(enteredText.value.text)
+                            .set(
+                                hashMapOf(
+                                    "name" to enteredText.value.text,
+                                    "muscleTargets" to muscleModel.muscles.toList()
+                                )
+                            )
+                            .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully written!") }
+                            .addOnFailureListener { e -> Log.w(TAG, "Error writing document", e) }
+                    }
+                                         },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Green700,
                         contentColor = Color.White
@@ -85,6 +96,12 @@ fun RoutinesScreen(
             Divider(color = Grey500)
         }
         item {
+            if (routines.value.isEmpty()) {
+                Text(
+                    text = "No available routines",
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
@@ -93,8 +110,6 @@ fun RoutinesScreen(
                         name = item.name,
                         muscleGroups = item.muscleGroups,
                         showDetails = {
-//                        switchToDetails(item)
-//                        navModel.switchWithArgs(Screen.RoutineDetails, item.name, item.name)
                             navModel.switchScreen(Screen.RoutineDetails)
                             navModel.updateTopBarText(item.name)
                             navController.navigate(Screen.RoutineDetails.withArgs(item.name))

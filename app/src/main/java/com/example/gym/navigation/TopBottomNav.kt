@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.gym.NavIcon
@@ -98,7 +99,9 @@ fun AppBar(
                 )
             }
         },
-        backgroundColor = Color.White,
+        contentColor = Color.Transparent,
+        backgroundColor = Color.Transparent,
+        elevation = 0.dp,
         modifier = modifier
     )
 }

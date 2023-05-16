@@ -2,6 +2,7 @@ package com.example.gym
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import com.example.gym.database.MuscleType
 import com.example.gym.navigation.Screen
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -14,6 +15,7 @@ data class Routine(
     var muscleGroups: List<String>
 )
 data class Exercise(
+//    var id: Long,
     var name: String,
     var muscleGroups: List<String>,
 )

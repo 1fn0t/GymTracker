@@ -27,3 +27,9 @@ val Grey100 = Color(0xFFfafafa)
 val Grey200 = Color(0xFFf5f5f5)
 val Grey300 = Color(0xFFf0f0f0)
 val Grey500 = Color(0xFFc2c2c2)
+
+val BlueGray50 = Color(0xFFECEFF1)
+val BlueGray200 = Color(0xFFB0BEC5)
+val BlueGray300 = Color(0xFF90A4AE)
+
+

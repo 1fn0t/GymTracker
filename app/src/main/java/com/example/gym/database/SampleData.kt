@@ -1,12 +1,26 @@
-package com.example.gym
+package com.example.gym.database
+
+import com.example.gym.Exercise
+import com.example.gym.MuscleGroup
+import com.example.gym.Routine
+import java.util.*
+
+//private val mockExercises = listOf(
+//    Exercise(generateUniqueId(), "Squats", listOf("Quads", "Hamstrings")),
+//    Exercise(generateUniqueId(), "Leg Extensions", listOf("Quads")),
+//    Exercise(generateUniqueId(), "Bulgarian Squat", listOf("Glutes", "Quads")),
+//    Exercise(generateUniqueId(), "Hamstring Curls", listOf("Hamstrings")),
+//    Exercise(generateUniqueId(), "Calve raises", listOf("Calves"))
+//)
 
 private val mockExercises = listOf(
-    Exercise("Squats", listOf("Quads", "Hamstrings")),
+    Exercise( "Squats", listOf("Quads", "Hamstrings")),
     Exercise("Leg Extensions", listOf("Quads")),
     Exercise("Bulgarian Squat", listOf("Glutes", "Quads")),
     Exercise("Hamstring Curls", listOf("Hamstrings")),
     Exercise("Calve raises", listOf("Calves"))
 )
+
 
 fun getSampleExercises(): List<Exercise> {
     return mockExercises
@@ -73,4 +87,9 @@ fun getSampleMuscles(): List<MuscleGroup> {
 
 fun getMaxNumMuscles(): Int {
     return maxNumMuscles
+}
+
+fun generateUniqueId(): Long {
+    val uuid = UUID.randomUUID()
+    return uuid.mostSignificantBits and Long.MAX_VALUE
 }

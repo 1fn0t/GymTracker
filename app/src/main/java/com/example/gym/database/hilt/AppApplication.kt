@@ -1,4 +1,4 @@
-package com.example.gym
+package com.example.gym.database.hilt
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

@@ -5,16 +5,21 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.example.gym.Exercise
-import java.time.LocalDate
+import com.example.gym.database.converters.DateConverters
+import com.example.gym.database.converters.ExerciseConverters
+import com.example.gym.database.converters.IntegerConverters
+import com.example.gym.database.converters.StringConverters
 import java.time.LocalDateTime
-import java.util.Date
 
 @Entity(tableName = "exercises")
 data class ExerciseItem(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0L,
+//    @PrimaryKey(autoGenerate = true)
+//    val id: Long = 0L,
 
-    @ColumnInfo(name = "content")
+//    @ColumnInfo(name = "content")
+//    var name: String,
+
+    @PrimaryKey
     var name: String,
 
     @ColumnInfo(name = "muscles_targeted")

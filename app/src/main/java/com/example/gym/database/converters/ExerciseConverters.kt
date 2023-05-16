@@ -1,4 +1,4 @@
-package com.example.gym.database
+package com.example.gym.database.converters
 
 import androidx.room.TypeConverter
 import com.example.gym.Exercise

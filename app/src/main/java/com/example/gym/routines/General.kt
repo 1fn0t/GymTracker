@@ -9,12 +9,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.fontResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.example.gym.MuscleGroup
-import com.example.gym.R
-import com.example.gym.getSampleMuscles
+import com.example.gym.database.getSampleMuscles
 
 
 @Composable
