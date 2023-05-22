@@ -31,6 +31,8 @@ data class ExerciseItem(
 data class RoutineItem(
 
     @PrimaryKey
+    val id: Long = 0L,
+
     @ColumnInfo(name = "routine_name")
     var name: String,
 

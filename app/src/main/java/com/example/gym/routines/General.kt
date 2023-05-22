@@ -19,12 +19,14 @@ import com.example.gym.database.getSampleMuscles
 fun NameTextField(
     enteredName: MutableState<TextFieldValue>,
     labelText: String,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     TextField(value = enteredName.value,
         onValueChange = { currentEntered -> enteredName.value = currentEntered },
         label = { Text(labelText) },
         singleLine = true,
+        enabled = enabled,
         modifier = modifier
     )
 }
@@ -51,7 +53,6 @@ fun MuscleCheckboxes(
                 Text(
                     text = group.type.toString().lowercase().capitalize(),
                     style = MaterialTheme.typography.bodyLarge,
-//                    font = R.font.kulim_park_regular,
                     modifier = Modifier
                         .width(104.dp)
                         .align(Alignment.CenterVertically)

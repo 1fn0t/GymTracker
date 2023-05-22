@@ -10,6 +10,7 @@ import java.util.*
 
 
 data class Routine(
+    var id: Long,
     var name: String,
     var exercises: List<Exercise>,
     var muscleGroups: List<String>

@@ -12,7 +12,7 @@ import java.util.*
 //    Exercise(generateUniqueId(), "Hamstring Curls", listOf("Hamstrings")),
 //    Exercise(generateUniqueId(), "Calve raises", listOf("Calves"))
 //)
-
+//
 private val mockExercises = listOf(
     Exercise( "Squats", listOf("Quads", "Hamstrings")),
     Exercise("Leg Extensions", listOf("Quads")),
@@ -27,6 +27,7 @@ fun getSampleExercises(): List<Exercise> {
 }
 
 private val mockRoutine = Routine(
+    generateUniqueId(),
     "Leg Day",
     mockExercises,
     listOf(

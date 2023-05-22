@@ -40,7 +40,13 @@ interface TrackerDatabaseDao {
 //    @Query("SELECT * FROM $ROUTINE_TABLE WHERE id=:id")
 //    fun getRoutineById(id: String): RoutineItem
     @Query("SELECT * FROM $ROUTINE_TABLE WHERE routine_name=:name")
-    suspend fun getRoutineByName(name: String): RoutineItem
+    suspend fun getRoutineByName(name: String): RoutineItem?
+
+    @Query("SELECT * FROM $ROUTINE_TABLE WHERE id=:id")
+    suspend fun getRoutineById(id: Long): RoutineItem?
+
+    @Query("SELECT * FROM $EXERCISE_TABLE WHERE name=:name")
+    suspend fun getExerciseByName(name: String): ExerciseItem?
 
     @Insert
     suspend fun insert(item: SessionItem)

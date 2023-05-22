@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.example.gym.database.DatabaseViewModel
 import com.example.gym.routines.formatElementsInOneLine
 import com.example.gym.ui.theme.Grey500
+import com.google.firebase.firestore.FirebaseFirestore
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.math.roundToInt
@@ -24,6 +25,8 @@ import kotlin.math.roundToInt
 @Composable
 fun DashboardScreen(
     repoModel: DatabaseViewModel,
+    firestoreDb: FirebaseFirestore,
+    uEmail: String?,
     modifier: Modifier = Modifier.fillMaxWidth()
 ) {
     val routines = repoModel.retrieveRoutinesFromDB().collectAsState(initial = listOf())
@@ -78,15 +81,15 @@ fun DashboardScreen(
         }
         item {
             if (clicked) {
-                selectedRoutine?.let {
+                selectedRoutine?.let { routine ->
                     Column() {
                         Divider(color = Grey500)
-                        var textFields = remember { (List(it.exercises.size) {TextFieldValue("")}).toMutableStateList() }
+                        var textFields = remember { (List(routine.exercises.size) {TextFieldValue("")}).toMutableStateList() }
 //                        var textFields = mutableListOf<TextFieldValue>()
 //                        remember {
 //                            textFields.addAll(List(it.exercises.size) { TextFieldValue("") })
 //                        }
-                        it.exercises.forEachIndexed { index, exercise ->
+                        routine.exercises.forEachIndexed { index, exercise ->
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -106,7 +109,7 @@ fun DashboardScreen(
                             }
                         }
                         ElevatedButton(onClick = {
-                            it.exercises.forEachIndexed { index, exercise ->
+                            routine.exercises.forEachIndexed { index, exercise ->
                                 Log.d("Dashboard Screen", "Exercise: ${exercise.name}, Rep count: ${textFields[index].text}")
                             }
                             val repCounts = mutableListOf<Int>()
@@ -118,11 +121,22 @@ fun DashboardScreen(
                                     repCounts.add(textFieldValue.text.toDouble().roundToInt())
                                 }
                             }
-                            repoModel.storeSessionEntryInDB(
-                                SessionEntry(it.name, repCounts = repCounts, dateCreated = dateTime)
-                            )
-                            selectedRoutine = null
-                            clicked = false
+                            uEmail?.let { email ->
+                                firestoreDb.collection("data").document(email).collection("entries").document(dateTime.toString())
+                                    .set(
+                                        hashMapOf(
+                                            "routineName" to routine.name,
+                                            "routineId" to routine.id,
+                                            "repCounts" to repCounts,
+                                            "datetime" to dateTime
+                                        )
+                                    )
+                                repoModel.storeSessionEntryInDB(
+                                    SessionEntry(routine.name, repCounts = repCounts, dateCreated = dateTime)
+                                )
+                                selectedRoutine = null
+                                clicked = false
+                            }
                         },
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                             ) {

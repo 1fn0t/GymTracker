@@ -3,7 +3,6 @@ package com.example.gym.database
 import com.example.gym.Exercise
 import com.example.gym.Routine
 import com.example.gym.SessionEntry
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class TrackerRepository @Inject constructor(
@@ -44,6 +43,7 @@ class TrackerRepository @Inject constructor(
     suspend fun addRoutine(item: Routine) {
         trackerDatabaseDao.insert(
             RoutineItem(
+                id = item.id,
                 name = item.name,
                 exercises = item.exercises,
                 muscles = item.muscleGroups
@@ -54,6 +54,7 @@ class TrackerRepository @Inject constructor(
     suspend fun updateRoutine(item: Routine) {
         trackerDatabaseDao.update(
             RoutineItem(
+                id = item.id,
                 name = item.name,
                 exercises = item.exercises,
                 muscles = item.muscleGroups
@@ -64,6 +65,7 @@ class TrackerRepository @Inject constructor(
     suspend fun deleteRoutine(item: Routine) {
         trackerDatabaseDao.delete(
             RoutineItem(
+                id = item.id,
                 name = item.name,
                 exercises = item.exercises,
                 muscles = item.muscleGroups
@@ -74,8 +76,16 @@ class TrackerRepository @Inject constructor(
 //    fun readRoutineById(id: String): RoutineItem {
 //        return trackerDatabaseDao.getRoutineById(id)
 //    }
-    suspend fun readRoutineByName(name: String): RoutineItem {
+    suspend fun readRoutineByName(name: String): RoutineItem? {
         return trackerDatabaseDao.getRoutineByName(name)
+    }
+
+    suspend fun readRoutineById(id: Long): RoutineItem? {
+        return trackerDatabaseDao.getRoutineById(id)
+    }
+
+    suspend fun readExerciseByName(name: String): ExerciseItem? {
+        return trackerDatabaseDao.getExerciseByName(name)
     }
 
     suspend fun addSessionEntry(entry: SessionEntry) {

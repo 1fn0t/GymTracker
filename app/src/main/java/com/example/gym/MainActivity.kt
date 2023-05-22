@@ -103,7 +103,8 @@ class MainActivity : ComponentActivity() {
 ////                                SignInScreen(auth = auth, navController = navController, mod)
 //                            }
                             composable(route = Screen.Dashboard.route) {
-                                DashboardScreen(repoModel = databaseModel, mod)
+                                DashboardScreen(repoModel = databaseModel, firestoreDb = firestoreDb,
+                                    uEmail = auth.currentUser?.email, mod)
                             }
                             composable(route = Screen.Profile.route) {
                                 ProfileScreen(auth = auth, navModel = navModel, mod)
@@ -117,16 +118,26 @@ class MainActivity : ComponentActivity() {
                                     modifier = mod)
                             }
                             composable(
-                                route = Screen.RoutineDetails.route + "/{detailName}",
+//                                route = Screen.RoutineDetails.route + "/{detailName}",
+//                                arguments = listOf(
+//                                    navArgument("detailName") {
+//                                        type = NavType.StringType
+//                                        defaultValue = "Error"
+//                                        nullable = true
+//                                    }
+//                                )
+                                route = Screen.RoutineDetails.route + "/{routineId}",
                                 arguments = listOf(
-                                    navArgument("detailName") {
+                                    navArgument("routineId") {
                                         type = NavType.StringType
                                         defaultValue = "Error"
-                                        nullable = true
                                     }
                                 )
                             ) { entry ->
-                                RoutineDetailsScreen(detailName = entry.arguments?.getString("detailName"),
+//                                RoutineDetailsScreen(detailName = entry.arguments?.getString("detailName"),
+//                                    repoModel = databaseModel, navController = navController, navModel = navModel,
+//                                    firestoreDb = firestoreDb, uEmail = auth.currentUser?.email, modifier =mod)
+                                RoutineDetailsScreen(routineId = entry.arguments!!.getString("routineId"),
                                     repoModel = databaseModel, navController = navController, navModel = navModel,
                                     firestoreDb = firestoreDb, uEmail = auth.currentUser?.email, modifier =mod)
                             }

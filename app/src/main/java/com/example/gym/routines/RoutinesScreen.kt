@@ -1,6 +1,7 @@
 package com.example.gym.routines
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,6 +10,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -23,6 +26,7 @@ import com.example.gym.ui.theme.Grey300
 import com.example.gym.ui.theme.Grey500
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
 private const val TAG = "Routines Screen"
 
@@ -37,18 +41,94 @@ fun RoutinesScreen(
     modifier: Modifier = Modifier
 ) {
     val routines = repoModel.retrieveRoutinesFromDB().collectAsState(initial = listOf())
+    val exercises = repoModel.retrieveExercisesFromDB().collectAsState(initial = listOf())
     var enteredText = remember { mutableStateOf(TextFieldValue("")) }
+    var displayingExercises by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = modifier.padding(horizontal = 24.dp)
+        modifier = modifier.padding(top = 32.dp, start = 24.dp, end = 24.dp)
     ) {
+        item {
+            Row (
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+//                modifier = Modifier.fillMaxWidth()
+                    ){
+                NameTextField(enteredName = enteredText, labelText = "Enter exercise name", modifier = Modifier.width(220.dp))
+                ElevatedButton(onClick = {
+                    if (enteredText.value.text.isNotEmpty()) {
+                        scope.launch {
+                            if (repoModel.retrieveExerciseByName(enteredText.value.text) == null) {
+                                repoModel.storeExerciseInDB(
+                                    enteredText.value.text,
+                                    muscleModel.muscles.toList()
+                                )
+                                uEmail?.let {
+                                    firestoreDb.collection("data").document(it)
+                                        .collection("exercise").document(enteredText.value.text)
+                                        .set(
+                                            hashMapOf(
+                                                "name" to enteredText.value.text,
+                                                "muscleTargets" to muscleModel.muscles.toList()
+                                            )
+                                        )
+                                        .addOnSuccessListener {
+                                            Log.d(
+                                                TAG,
+                                                "DocumentSnapshot successfully written!"
+                                            )
+                                        }
+                                        .addOnFailureListener { e ->
+                                            Log.w(
+                                                TAG,
+                                                "Error writing document",
+                                                e
+                                            )
+                                        }
+                                }
+                                Toast.makeText(context, "Exercise Created", Toast.LENGTH_SHORT)
+                                    .show()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "An exercise with this name already exists",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    } else {
+                        Toast.makeText(context, "Unable to create a exercise without a name", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Green700,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "Create",
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+            }
+
+        }
+        item {
+            Divider(color = Grey300)
+            MuscleCheckboxes(addMuscles = { muscle -> muscleModel.addMuscle(muscle) },
+                removeMuscles = { muscle -> muscleModel.removeMuscle(muscle) },
+            )
+            Divider(color = Grey300)
+        }
         item {
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp)
             ) {
                 OutlinedButton(onClick = {
                     navModel.switchScreen(Screen.AddRoutine)
@@ -59,62 +139,73 @@ fun RoutinesScreen(
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
-                ElevatedButton(onClick = {
-                    repoModel.storeExerciseInDB(enteredText.value.text, muscleModel.muscles.toList())
-                    uEmail?.let {
-                        firestoreDb.collection("data").document(it).collection("exercise").document(enteredText.value.text)
-                            .set(
-                                hashMapOf(
-                                    "name" to enteredText.value.text,
-                                    "muscleTargets" to muscleModel.muscles.toList()
-                                )
-                            )
-                            .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully written!") }
-                            .addOnFailureListener { e -> Log.w(TAG, "Error writing document", e) }
-                    }
-                                         },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Green700,
-                        contentColor = Color.White
-                    )
-                ) {
+                OutlinedButton(onClick = {
+                    displayingExercises = !displayingExercises
+                }) {
                     Text(
-                        text = stringResource(R.string.create_exercises),
+                        text = if (displayingExercises) "routines" else "exercises",
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
             }
         }
         item {
-            NameTextField(enteredName = enteredText, labelText = "Enter exercise name")
-        }
-        item {
-            Divider(color = Grey300)
-            MuscleCheckboxes(addMuscles = { muscle -> muscleModel.addMuscle(muscle) },
-                removeMuscles = { muscle -> muscleModel.removeMuscle(muscle) },
-            )
             Divider(color = Grey500)
-        }
-        item {
-            if (routines.value.isEmpty()) {
-                Text(
-                    text = "No available routines",
-                    style = MaterialTheme.typography.headlineSmall
-                )
-            }
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                routines.value.forEachIndexed { _, item ->
-                    RoutinesItem(
-                        name = item.name,
-                        muscleGroups = item.muscleGroups,
-                        showDetails = {
-                            navModel.switchScreen(Screen.RoutineDetails)
-                            navModel.updateTopBarText(item.name)
-                            navController.navigate(Screen.RoutineDetails.withArgs(item.name))
-                        }
+            if (displayingExercises) {
+                if (exercises.value.isEmpty()) {
+                    Text(
+                        text = "No available exercises",
+                        style = MaterialTheme.typography.headlineSmall
                     )
+                }
+                Column (
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ){
+                    exercises.value.forEachIndexed { _, item ->
+                        ExercisesItem(name = item.name, muscleGroups = item.muscleGroups, delete = {
+                            repoModel.deleteExerciseInDB(item)
+                            uEmail?.let { email ->
+                                firestoreDb.collection("data").document(email).collection("exercise")
+                                    .document(item.name)
+                                    .delete()
+                                    .addOnSuccessListener {
+                                        Log.d(
+                                            TAG,
+                                            "DocumentSnapshot successfully deleted!"
+                                        )
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.w(
+                                            TAG,
+                                            "Error deleting document",
+                                            e
+                                        )
+                                    }
+                            }
+                        })
+                    }
+                }
+            } else {
+                if (routines.value.isEmpty()) {
+                    Text(
+                        text = "No available routines",
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                }
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    routines.value.forEachIndexed { _, item ->
+                        RoutinesItem(
+                            name = item.name,
+                            muscleGroups = item.muscleGroups,
+                            showDetails = {
+                                navModel.switchScreen(Screen.RoutineDetails)
+                                navModel.updateTopBarText(item.name)
+                                navController.navigate(Screen.RoutineDetails.withArgs(item.id.toString()))
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -134,7 +225,8 @@ fun RoutinesItem(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
             .clickable {
                 showDetails()
             }
@@ -147,6 +239,41 @@ fun RoutinesItem(
             text = "Muscles Targeted: " + formatElementsInOneLine(muscleGroups),
             style = MaterialTheme.typography.bodyMedium
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExercisesItem(
+    name: String,
+    muscleGroups: List<String>,
+    delete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row (
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+        .fillMaxWidth()) {
+        Column(
+
+        ) {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.headlineSmall
+            )
+            Text(
+                text = "Muscles Targeted: " + formatElementsInOneLine(muscleGroups),
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+        }
+        FilledTonalIconButton(onClick = { delete() }, modifier = Modifier.size(24.dp)) {
+            Icon(
+                painter = painterResource(R.drawable.baseline_delete_24),
+                contentDescription = stringResource(R.string.delete_routine)
+            )
+        }
     }
 }
 

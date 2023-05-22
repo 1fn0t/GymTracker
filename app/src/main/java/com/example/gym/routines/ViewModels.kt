@@ -2,8 +2,11 @@ package com.example.gym.routines
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import com.example.gym.Exercise
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class MuscleViewModel: ViewModel() {
     private val _muscles: SnapshotStateList<String> = mutableStateListOf()
@@ -21,19 +24,31 @@ class MuscleViewModel: ViewModel() {
     }
 }
 class ExerciseViewModel: ViewModel() {
-    private val _exercises: SnapshotStateList<Exercise> = mutableStateListOf()
+    private var _exercises = mutableStateListOf<Exercise>()
     val exercises: List<Exercise>
         get() = _exercises
+
+    private var _selectedExercises = mutableListOf<Exercise>()
+    val selectedExercises: List<Exercise>
+        get() = _selectedExercises
     fun addExercise(exercise: Exercise) {
-        _exercises.add(exercise)
+        _selectedExercises.add(exercise)
     }
     fun addAllExercises(exercises: List<Exercise>) {
         _exercises.addAll(exercises)
     }
     fun removeExercise(exercise: Exercise) {
-        _exercises.remove(exercise)
+        _selectedExercises.remove(exercise)
     }
     fun clearExercises() {
+        _selectedExercises.clear()
         _exercises.clear()
+    }
+    fun updateExercises() {
+        _exercises.addAll(selectedExercises)
+
+        val uniqueSet = _exercises.toSet()
+        _exercises = uniqueSet.toMutableStateList()
+        _selectedExercises.clear()
     }
 }

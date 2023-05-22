@@ -71,7 +71,7 @@ fun StatisticsScreen(
                 } else {
                     foundRoutines.add(entry.routineName)
                     val routine = repoModel.retrieveRoutineByName(entry.routineName)
-                    val exerciseStatistics = routine.exercises.mapIndexed { index, exercise ->
+                    val exerciseStatistics = routine!!.exercises.mapIndexed { index, exercise ->
                         ExerciseStatistic(
                             exerciseName = exercise.name,
                             repCounts = mutableListOf(entry.repCounts[index].toFloat())
