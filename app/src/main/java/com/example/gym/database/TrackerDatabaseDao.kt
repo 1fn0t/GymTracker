@@ -1,7 +1,6 @@
 package com.example.gym.database
 
 import androidx.room.*
-import com.example.gym.Routine
 import kotlinx.coroutines.flow.Flow
 
 @Dao

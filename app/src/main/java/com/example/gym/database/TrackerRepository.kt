@@ -93,7 +93,7 @@ class TrackerRepository @Inject constructor(
             SessionItem(
                 routineName = entry.routineName,
                 repCounts = entry.repCounts,
-                dateCreated = entry.dateCreated,
+                dateCreated = entry.dateCreated.value,
             )
         )
     }

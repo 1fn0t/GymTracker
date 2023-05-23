@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -50,7 +49,7 @@ fun RoutineDetailsScreen(
         mutableStateOf(false)
     }
     val exerciseModel: ExerciseViewModel = viewModel()
-    var enteredName = remember { mutableStateOf(TextFieldValue("")) }
+    val enteredName = remember { mutableStateOf(TextFieldValue("")) }
 
     val enteredInSearch = remember { mutableStateOf(TextFieldValue("")) }
     LaunchedEffect(key1 = numUpdates) {
@@ -179,7 +178,7 @@ fun RoutineDetailsScreen(
                                 exerciseModel.updateExercises()
 //                                        var updatedExercises =
 //                                            routine!!.exercises as MutableList<Exercise>
-                                var updatedExercises =
+                                val updatedExercises =
                                     exerciseModel.exercises as MutableList<Exercise>
                                 updatedExercises.remove(exercise)
                                 updateDb(

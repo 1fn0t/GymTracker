@@ -1,4 +1,4 @@
-package com.example.gym
+package com.example.gym.miscellaneous_screens
 
 import android.util.Log
 import android.widget.Toast
@@ -12,17 +12,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.gym.Exercise
+import com.example.gym.Routine
+import com.example.gym.SessionEntry
+import com.example.gym.database.DatabaseViewModel
 import com.example.gym.navigation.NavViewModel
 import com.example.gym.navigation.Screen
-import com.example.gym.ui.theme.*
+import com.example.gym.ui.theme.BlueGray200
+import com.example.gym.ui.theme.Green300
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
 
 private const val TAG = "Sign In/ Sign Up"
 
@@ -30,6 +31,8 @@ private const val TAG = "Sign In/ Sign Up"
 fun SignInScreen(
     auth: FirebaseAuth,
     navController: NavController,
+    firestoreDb: FirebaseFirestore,
+    repoModel: DatabaseViewModel,
     navModel: NavViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -75,9 +78,8 @@ fun SignInScreen(
                         if (task.isSuccessful) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success")
-                            val user = auth.currentUser
                             navModel.updateSignIn(true)
-//                            updateUI(user)
+                            downloadData(uEmail = auth.currentUser!!.email, firestoreDb = firestoreDb, repoModel = repoModel)
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.exception)
@@ -86,7 +88,6 @@ fun SignInScreen(
                                 "Authentication failed.",
                                 Toast.LENGTH_SHORT,
                             ).show()
-//                            updateUI(null)
                         }
                     }
 
@@ -206,23 +207,35 @@ fun SignUpScreen(
     }
 }
 
-@Composable
-@Preview(showBackground = true)
-fun SignInPreview() {
-    val auth = Firebase.auth
-    val navController = rememberNavController()
-    val navModel: NavViewModel = viewModel()
-    GymTheme {
-        SignInScreen(
-            auth = auth,
-            navController = navController,
-            navModel = navModel
-        )
+fun downloadData(uEmail: String?, firestoreDb: FirebaseFirestore, repoModel: DatabaseViewModel) {
+    uEmail?.let { email ->
+        val root = firestoreDb.collection("data").document(email)
+        root.collection("exercise").get().addOnSuccessListener { querySnapshot ->
+            for (document in querySnapshot.documents) {
+                val exercise = document.toObject(Exercise::class.java)
+                exercise?.let {
+                    repoModel.storeExerciseInDB(exercise.name, exercise.muscleGroups)
+                }
+            }
+        }
+        root.collection("routine").get().addOnSuccessListener { querySnapshot ->
+            for (document in querySnapshot.documents) {
+                val routine = Routine.fromDocumentSnapshot(document)
+                routine.let {
+                    repoModel.storeRoutineInDB(name = routine.name, exercises = routine.exercises,
+                        muscleGroups = routine.muscleGroups, id = routine.id)
+                }
+//                Log.d(TAG, routine.toString())
+            }
+        }
+        root.collection("entry").get().addOnSuccessListener { querySnapshot ->
+            for (document in querySnapshot.documents) {
+                val entry = SessionEntry.fromDocumentSnapshot(document)
+                entry.let {
+                    repoModel.storeSessionEntryInDB(entry)
+                }
+//                Log.d(TAG, entry.toString())
+            }
+        }
     }
-}
-
-@Composable
-@Preview(showBackground = true)
-fun SignUpPreview() {
-
 }

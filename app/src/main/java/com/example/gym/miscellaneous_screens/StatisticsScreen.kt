@@ -1,4 +1,4 @@
-package com.example.gym.database
+package com.example.gym.miscellaneous_screens
 
 import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.gym.ExerciseStatistic
 import com.example.gym.SessionStatistic
+import com.example.gym.database.DatabaseViewModel
 import com.patrykandpatrick.vico.compose.axis.horizontal.bottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.startAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
@@ -41,7 +42,6 @@ import com.patrykandpatrick.vico.core.component.shape.Shapes
 import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShaders
 import com.patrykandpatrick.vico.core.entry.ChartEntryModel
 import com.patrykandpatrick.vico.core.entry.FloatEntry
-import com.patrykandpatrick.vico.core.entry.entriesOf
 import com.patrykandpatrick.vico.core.entry.entryModelOf
 import kotlin.random.Random
 
@@ -51,17 +51,17 @@ fun StatisticsScreen(
     modifier: Modifier = Modifier
 ) {
     val sessions = repoModel.retrieveSessionsWithinMonthFromDB().collectAsState(initial = listOf())
-    var foundRoutines by remember {
+    val foundRoutines by remember {
         mutableStateOf(mutableListOf<String>())
     }
-    var routinesMap by remember {
+    val routinesMap by remember {
         mutableStateOf(mutableMapOf<String, List<String>>())
     }
     var entryModels by remember {
         mutableStateOf(emptyList<ChartEntryModel>())
     }
     LaunchedEffect(key1 = sessions.value) {
-        var statistics = mutableListOf<SessionStatistic>()
+        val statistics = mutableListOf<SessionStatistic>()
         sessions.value.forEach { entry ->
                 val index = foundRoutines.indexOf(entry.routineName)
                 if (index != -1) {
@@ -85,22 +85,20 @@ fun StatisticsScreen(
                     )
                 }
         }
-        var newModels = mutableListOf<ChartEntryModel>()
+        val newModels = mutableListOf<ChartEntryModel>()
         statistics.forEach { statistic ->
             val entries = mutableListOf<List<FloatEntry>>()
-            var listExercises = mutableListOf<String>()
+            val listExercises = mutableListOf<String>()
             statistic.exerciseStatistics.forEach {
                 listExercises.add(it.exerciseName)
                 entries.add(it.repCounts.mapIndexed { index, count -> FloatEntry(index.toFloat(), count) })
             }
-            routinesMap.put(statistic.routineName, listExercises)
+            routinesMap[statistic.routineName] = listExercises
             newModels.add(entryModelOf(*entries.toTypedArray()))
         }
         entryModels = newModels
         Log.d("Statistics Screen", statistics.toString())
     }
-    val test1 = listOf(entriesOf(1f, 4f, 6f), entriesOf(5f, 10f, 4f))
-    val chartEntryModel2 = entryModelOf(*test1.toTypedArray())
     Column(
         modifier = modifier.padding(top = 16.dp, start = 24.dp, end= 24.dp)
     ) {
@@ -136,7 +134,7 @@ fun StatisticsScreen(
                                 horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside
                             ),
                             bottomAxis = bottomAxis(),
-                            legend = routinesMap.get(foundRoutines[index])
+                            legend = routinesMap[foundRoutines[index]]
                                 ?.let { rememberLegend(chartColors, it) },
                             modifier = Modifier.width(340.dp).height(280.dp)
                         )
@@ -148,7 +146,7 @@ fun StatisticsScreen(
 }
 
 fun randomListColors(numberOfColors: Int): List<Color> {
-    var colors = mutableListOf<Color>()
+    val colors = mutableListOf<Color>()
     for (i in 0 until numberOfColors) {
         colors.add(randomColor())
     }

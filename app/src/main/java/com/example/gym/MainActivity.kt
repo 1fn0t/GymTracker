@@ -15,8 +15,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.gym.database.DatabaseViewModel
-import com.example.gym.database.StatisticsScreen
+import com.example.gym.miscellaneous_screens.StatisticsScreen
 import com.example.gym.database.TrackerRepository
+import com.example.gym.miscellaneous_screens.SignInScreen
+import com.example.gym.miscellaneous_screens.SignUpScreen
 import com.example.gym.navigation.*
 import com.example.gym.routines.AddRoutinesScreen
 import com.example.gym.routines.RoutineDetailsScreen
@@ -68,7 +70,9 @@ class MainActivity : ComponentActivity() {
                 if (!navModel.signedIn) {
                     NavHost(navController = navController, startDestination = Screen.SignIn.route) {
                         composable(route = Screen.SignIn.route) {
-                            SignInScreen(auth = auth, navController = navController, navModel = navModel, mod)
+                            SignInScreen(auth = auth, navController = navController, navModel = navModel,
+                                firestoreDb = firestoreDb, repoModel = databaseModel,
+                                modifier = mod)
                         }
                         composable(route = Screen.SignUp.route) {
                             SignUpScreen(auth = auth, navController = navController, mod)

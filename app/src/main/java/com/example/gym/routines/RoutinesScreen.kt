@@ -24,7 +24,6 @@ import com.example.gym.navigation.Screen
 import com.example.gym.ui.theme.Green700
 import com.example.gym.ui.theme.Grey300
 import com.example.gym.ui.theme.Grey500
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
@@ -37,12 +36,12 @@ fun RoutinesScreen(
     firestoreDb: FirebaseFirestore,
     uEmail: String?,
     repoModel: DatabaseViewModel,
+    modifier: Modifier = Modifier,
     muscleModel: MuscleViewModel = viewModel(),
-    modifier: Modifier = Modifier
 ) {
     val routines = repoModel.retrieveRoutinesFromDB().collectAsState(initial = listOf())
     val exercises = repoModel.retrieveExercisesFromDB().collectAsState(initial = listOf())
-    var enteredText = remember { mutableStateOf(TextFieldValue("")) }
+    val enteredText = remember { mutableStateOf(TextFieldValue("")) }
     var displayingExercises by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
@@ -73,7 +72,7 @@ fun RoutinesScreen(
                                         .set(
                                             hashMapOf(
                                                 "name" to enteredText.value.text,
-                                                "muscleTargets" to muscleModel.muscles.toList()
+                                                "muscleGroups" to muscleModel.muscles.toList()
                                             )
                                         )
                                         .addOnSuccessListener {

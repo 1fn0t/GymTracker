@@ -5,8 +5,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import com.example.gym.Exercise
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 class MuscleViewModel: ViewModel() {
     private val _muscles: SnapshotStateList<String> = mutableStateListOf()

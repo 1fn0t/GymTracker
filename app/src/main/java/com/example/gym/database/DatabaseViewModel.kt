@@ -3,15 +3,14 @@ package com.example.gym.database
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.gym.CustomDateTime
 import com.example.gym.Exercise
 import com.example.gym.Routine
 import com.example.gym.SessionEntry
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,10 +30,10 @@ class DatabaseViewModel  @Inject constructor(private val trackerRepo: TrackerRep
     }
 
     fun storeRoutineInDB(name: String, exercises: List<Exercise>, muscleGroups: List<String>, id: Long) {
-        Log.d("DatabaseViewModel", "1 " + id.toString())
+        Log.d("DatabaseViewModel", "1 $id")
 
         viewModelScope.launch {
-            Log.d("DatabaseViewModel", "2 " + id.toString())
+            Log.d("DatabaseViewModel", "2 $id")
             trackerRepo.addRoutine(
                 Routine(
                     id = id,
@@ -43,7 +42,7 @@ class DatabaseViewModel  @Inject constructor(private val trackerRepo: TrackerRep
                     muscleGroups = muscleGroups
                 )
             )
-            Log.d("DatabaseViewModel", "3" + id.toString())
+            Log.d("DatabaseViewModel", "3$id")
         }
     }
 
@@ -146,7 +145,7 @@ class DatabaseViewModel  @Inject constructor(private val trackerRepo: TrackerRep
                 SessionEntry(
                     routineName = it.routineName,
                     repCounts = it.repCounts,
-                    dateCreated = it.dateCreated
+                    dateCreated = CustomDateTime(it.dateCreated)
                 )
             }
         }
@@ -158,7 +157,7 @@ class DatabaseViewModel  @Inject constructor(private val trackerRepo: TrackerRep
                 SessionEntry(
                     routineName = it.routineName,
                     repCounts = it.repCounts,
-                    dateCreated = it.dateCreated
+                    dateCreated = CustomDateTime(it.dateCreated)
                 )
             }
         }

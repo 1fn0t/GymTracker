@@ -1,9 +1,6 @@
 package com.example.gym.database
 
-import com.example.gym.Exercise
 import com.example.gym.MuscleGroup
-import com.example.gym.Routine
-import java.util.*
 
 //private val mockExercises = listOf(
 //    Exercise(generateUniqueId(), "Squats", listOf("Quads", "Hamstrings")),
@@ -13,36 +10,36 @@ import java.util.*
 //    Exercise(generateUniqueId(), "Calve raises", listOf("Calves"))
 //)
 //
-private val mockExercises = listOf(
-    Exercise( "Squats", listOf("Quads", "Hamstrings")),
-    Exercise("Leg Extensions", listOf("Quads")),
-    Exercise("Bulgarian Squat", listOf("Glutes", "Quads")),
-    Exercise("Hamstring Curls", listOf("Hamstrings")),
-    Exercise("Calve raises", listOf("Calves"))
-)
+//private val mockExercises = listOf(
+//    Exercise( "Squats", listOf("Quads", "Hamstrings")),
+//    Exercise("Leg Extensions", listOf("Quads")),
+//    Exercise("Bulgarian Squat", listOf("Glutes", "Quads")),
+//    Exercise("Hamstring Curls", listOf("Hamstrings")),
+//    Exercise("Calve raises", listOf("Calves"))
+//)
+//
+//
+//fun getSampleExercises(): List<Exercise> {
+//    return mockExercises
+//}
 
+//private val mockRoutine = Routine(
+//    generateUniqueId(),
+//    "Leg Day",
+//    mockExercises,
+//    listOf(
+//        "Quads", "Hamstrings", "Glutes", "Calves"
+//    )
+//)
+//private val mockRoutines = listOf(mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine)
 
-fun getSampleExercises(): List<Exercise> {
-    return mockExercises
-}
-
-private val mockRoutine = Routine(
-    generateUniqueId(),
-    "Leg Day",
-    mockExercises,
-    listOf(
-        "Quads", "Hamstrings", "Glutes", "Calves"
-    )
-)
-private val mockRoutines = listOf(mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine, mockRoutine)
-
-fun getSampleRoutine(): Routine {
-    return mockRoutine
-}
-
-fun getSampleRoutines(): List<Routine> {
-    return mockRoutines
-}
+//fun getSampleRoutine(): Routine {
+//    return mockRoutine
+//}
+//
+//fun getSampleRoutines(): List<Routine> {
+//    return mockRoutines
+//}
 
 enum class MuscleType {
     BACK,
@@ -79,18 +76,18 @@ private val sampleMuscles = listOf(
     MuscleGroup(listOf("Upper Chest", "Lower Chest"), MuscleType.CHEST),
 )
 
-private val maxNumMuscles = 4
+//private val maxNumMuscles = 4
 
 fun getSampleMuscles(): List<MuscleGroup> {
     return sampleMuscles
 }
 
 
-fun getMaxNumMuscles(): Int {
-    return maxNumMuscles
-}
-
-fun generateUniqueId(): Long {
-    val uuid = UUID.randomUUID()
-    return uuid.mostSignificantBits and Long.MAX_VALUE
-}
+//fun getMaxNumMuscles(): Int {
+//    return maxNumMuscles
+//}
+//
+//fun generateUniqueId(): Long {
+//    val uuid = UUID.randomUUID()
+//    return uuid.mostSignificantBits and Long.MAX_VALUE
+//}

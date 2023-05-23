@@ -17,7 +17,6 @@ import com.example.gym.database.DatabaseViewModel
 import com.example.gym.routines.formatElementsInOneLine
 import com.example.gym.ui.theme.Grey500
 import com.google.firebase.firestore.FirebaseFirestore
-import java.time.LocalDateTime
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -27,7 +26,7 @@ fun DashboardScreen(
     repoModel: DatabaseViewModel,
     firestoreDb: FirebaseFirestore,
     uEmail: String?,
-    modifier: Modifier = Modifier.fillMaxWidth()
+    modifier: Modifier = Modifier
 ) {
     val routines = repoModel.retrieveRoutinesFromDB().collectAsState(initial = listOf())
     var clicked by remember {
@@ -36,7 +35,7 @@ fun DashboardScreen(
     var selectedRoutine: Routine? by remember {
         mutableStateOf(null)
     }
-    var sessions = repoModel.retrieveMostRecentSessionEntriesFromDB().collectAsState(initial = listOf())
+    val sessions = repoModel.retrieveMostRecentSessionEntriesFromDB().collectAsState(initial = listOf())
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
@@ -84,7 +83,7 @@ fun DashboardScreen(
                 selectedRoutine?.let { routine ->
                     Column() {
                         Divider(color = Grey500)
-                        var textFields = remember { (List(routine.exercises.size) {TextFieldValue("")}).toMutableStateList() }
+                        val textFields = remember { (List(routine.exercises.size) {TextFieldValue("")}).toMutableStateList() }
 //                        var textFields = mutableListOf<TextFieldValue>()
 //                        remember {
 //                            textFields.addAll(List(it.exercises.size) { TextFieldValue("") })
@@ -113,7 +112,7 @@ fun DashboardScreen(
                                 Log.d("Dashboard Screen", "Exercise: ${exercise.name}, Rep count: ${textFields[index].text}")
                             }
                             val repCounts = mutableListOf<Int>()
-                            val dateTime = LocalDateTime.now()
+                            val dateTime = CustomDateTime()
                             textFields.forEach { textFieldValue ->
                                 if (textFieldValue.text.equals("")) {
                                     repCounts.add(0)
@@ -121,18 +120,20 @@ fun DashboardScreen(
                                     repCounts.add(textFieldValue.text.toDouble().roundToInt())
                                 }
                             }
+                            val sessionEntry = SessionEntry(routine.name, repCounts = repCounts, dateCreated = dateTime)
                             uEmail?.let { email ->
-                                firestoreDb.collection("data").document(email).collection("entries").document(dateTime.toString())
+                                firestoreDb.collection("data").document(email).collection("entry").document(dateTime.toString())
                                     .set(
-                                        hashMapOf(
-                                            "routineName" to routine.name,
-                                            "routineId" to routine.id,
-                                            "repCounts" to repCounts,
-                                            "datetime" to dateTime
-                                        )
+//                                        hashMapOf(
+//                                            "routineName" to routine.name,
+//                                            "routineId" to routine.id,
+//                                            "repCounts" to repCounts,
+//                                            "datetime" to dateTime
+//                                        )
+                                        sessionEntry
                                     )
                                 repoModel.storeSessionEntryInDB(
-                                    SessionEntry(routine.name, repCounts = repCounts, dateCreated = dateTime)
+                                    sessionEntry
                                 )
                                 selectedRoutine = null
                                 clicked = false
@@ -167,7 +168,7 @@ fun DashboardScreen(
                         Text(text = session.routineName, style = MaterialTheme.typography.headlineSmall)
                     }
                     Box {
-                        Text(text = "${session.dateCreated.month.name.toLowerCase().capitalize()} ${session.dateCreated.dayOfMonth}",
+                        Text(text = "${session.dateCreated.value.month.name.toLowerCase().capitalize()} ${session.dateCreated.value.dayOfMonth}",
                             style = MaterialTheme.typography.bodySmall)
                     }
                 }

@@ -10,11 +10,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gym.*
 import com.example.gym.R
@@ -30,14 +28,14 @@ private const val TAG = "Add Routines Scope"
 @Composable
 fun AddRoutinesScreen(
     context: Context,
+    firestoreDb: FirebaseFirestore,
+    repoModel: DatabaseViewModel,
+    modifier: Modifier = Modifier,
+    uEmail: String?,
     exerciseModel: ExerciseViewModel = viewModel(),
     muscleModel: MuscleViewModel = viewModel(),
-    firestoreDb: FirebaseFirestore,
-    uEmail: String?,
-    repoModel: DatabaseViewModel,
-    modifier: Modifier = Modifier
 ) {
-    var enteredName = remember { mutableStateOf(TextFieldValue("")) }
+    val enteredName = remember { mutableStateOf(TextFieldValue("")) }
     val enteredInSearch = remember { mutableStateOf(TextFieldValue("")) }
 //    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()

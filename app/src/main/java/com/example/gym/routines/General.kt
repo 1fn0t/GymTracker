@@ -19,8 +19,8 @@ import com.example.gym.database.getSampleMuscles
 fun NameTextField(
     enteredName: MutableState<TextFieldValue>,
     labelText: String,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier
 ) {
     TextField(value = enteredName.value,
         onValueChange = { currentEntered -> enteredName.value = currentEntered },
